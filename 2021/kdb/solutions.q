@@ -21,3 +21,9 @@ g:floor 0.5+avg t
 e:1-g
 d3p1:2 sv value g * 2 sv value e
 
+/ day 3, part 2 = skipped
+
+/ day 4, part 1 = skipped
+n:"I" $ "," vs first 1#read0 `day4.txt
+b:flip (`a`b`c`d`e)!("IIIII";2 3 3 3 3)0:t where not""~/:t:2_read0`:day4.txt
+

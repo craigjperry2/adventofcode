@@ -33,3 +33,7 @@ b:flip (`a`b`c`d`e)!("IIIII";2 3 3 3 3)0:t where not""~/:t:2_read0`:day4.txt
 / scan over bingo numbers, intersect with every row in table
 / stop scan when there's an inter of length 5
 
+/ day 5, part 1 = skipped
+
+/ day 6, part 1 =
+

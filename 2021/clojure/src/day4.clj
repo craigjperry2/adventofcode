@@ -8,6 +8,6 @@
   (println "Hello, world!"))
 
 (comment
-  (slurp (io/resource "day4.txt")))
+  (slurp "../data/day4.txt"))
   
   

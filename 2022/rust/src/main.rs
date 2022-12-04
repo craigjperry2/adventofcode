@@ -1,5 +1,5 @@
 use ferris_says::say;
-use std::{io::{stdout, BufWriter, Error, Write}, collections::HashMap};
+use std::{io::{stdout, BufWriter, Error, Write}, collections::{HashMap, HashSet}};
 use itertools::Itertools;
 
 fn main() -> Result<(), Error> {
@@ -16,6 +16,8 @@ fn main() -> Result<(), Error> {
 
     println!("Day 2 Part 1, total score: {}", day2p1(load_input(2)));
     println!("Day 2 Part 2, total score: {}", day2p2(load_input(2)));
+
+    println!("Day 3 Part 1, total score: {}", day3p1(load_input(3)));
 
     Ok(())
 }
@@ -89,4 +91,29 @@ fn score(input: &String, lookup: &HashMap<&str, i32>) -> i32 {
             lookup.get(&game).expect(format!("No score for {}", game).as_str())
         })
         .sum()             
+}
+
+fn priority(item: char) -> i32 {
+    (" abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        .find(item))
+        .expect("unexpected priority")
+        .try_into()
+        .expect("priority overflow")
+}
+
+fn day3p1(input: String) -> i32 {
+    input
+        .split_terminator("\n")
+        .map(|rucksack| {
+            let (left, right) = rucksack.split_at(rucksack.len() / 2);
+            let left_set: HashSet<char> = left.chars().collect();
+            right
+                .chars()
+                .unique()
+                .filter(|c| left_set.contains(c))
+                .map(priority)
+                .exactly_one()
+                .unwrap()
+        })
+        .sum()
 }

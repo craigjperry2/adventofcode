@@ -4,5 +4,8 @@ My attempts at solving https://adventofcode.com/
 
 Languages:
 
-* kdb / q
+* 2022
+  * Rust
+* 2021
+  * kdb / q
 

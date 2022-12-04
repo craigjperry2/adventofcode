@@ -18,6 +18,7 @@ fn main() -> Result<(), Error> {
     println!("Day 2 Part 2, total score: {}", day2p2(load_input(2)));
 
     println!("Day 3 Part 1, total score: {}", day3p1(load_input(3)));
+    println!("Day 3 Part 2, total score: {}", day3p2(load_input(3)));
 
     Ok(())
 }
@@ -115,5 +116,23 @@ fn day3p1(input: String) -> i32 {
                 .exactly_one()
                 .unwrap()
         })
+        .sum()
+}
+
+fn day3p2(input: String) -> i32 {
+    input
+        .split_terminator("\n")
+        .map(|rucksack| rucksack.chars().collect::<HashSet<char>>())
+        .chunks(3)
+        .into_iter()
+        .map(|group|
+            group
+                .reduce(|a, b| a.intersection(&b).copied().collect())
+                .expect("No common item in group")
+                .into_iter()
+                .exactly_one()
+                .expect("Multiple common items in group")
+        )
+        .map(priority)
         .sum()
 }

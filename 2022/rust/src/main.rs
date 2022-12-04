@@ -15,6 +15,7 @@ fn main() -> Result<(), Error> {
     println!( "Day 1 Part 2, total calories from top 3 elves: {}", day1p2(load_input(1)));
 
     println!("Day 2 Part 1, total score: {}", day2p1(load_input(2)));
+    println!("Day 2 Part 2, total score: {}", day2p2(load_input(2)));
 
     Ok(())
 }
@@ -63,6 +64,25 @@ fn day2p1(input: String) -> i32 {
     lookup.insert("C Y", 2);
     lookup.insert("C Z", 6);
 
+    score(&input, &lookup)
+}
+
+fn day2p2(input: String) -> i32 {
+    let mut lookup = HashMap::new();
+    lookup.insert("A X", 3);
+    lookup.insert("A Y", 4);
+    lookup.insert("A Z", 8);
+    lookup.insert("B X", 1);
+    lookup.insert("B Y", 5);
+    lookup.insert("B Z", 9);
+    lookup.insert("C X", 2);
+    lookup.insert("C Y", 6);
+    lookup.insert("C Z", 7);
+
+    score(&input, &lookup)
+}
+
+fn score(input: &String, lookup: &HashMap<&str, i32>) -> i32 {
     input
         .split_terminator("\n")
         .map(|game| {

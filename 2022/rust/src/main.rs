@@ -21,6 +21,7 @@ fn main() -> Result<(), Error> {
     println!("Day 3 Part 2, total score: {}", day3p2(load_input(3)));
 
     println!("Day 4 Part 1, total pairs: {}", day4p1(load_input(4)));
+    println!("Day 4 Part 2, total pairs: {}", day4p2(load_input(4)));
 
     Ok(())
 }
@@ -139,32 +140,6 @@ fn day3p2(input: String) -> i32 {
         .sum()
 }
 
-fn day4p1(input: String) -> i32 {
-    input
-        .split_terminator("\n")
-        .map(|assignments| {
-            // let comma = assignments.find(",").expect("No comma in assignment");
-            // let left = &assignments[..comma];
-            // let right = &assignments[comma+1..];
-            let (left, right) = split_and_parse::<String>(&assignments, ",");
-
-            // let hyphen = left.find("-").expect("No dash in left assignment");
-            // let left_from = left[..hyphen].parse::<i32>().expect("Left from is not a number");
-            // let left_to = left[hyphen+1..].parse::<i32>().expect("Left to is not a number");
-            let (left_from, left_to) = split_and_parse::<i32>(&left, "-");
-            let left_set: HashSet<i32> = (left_from..=left_to).collect();
-
-            // let hyphen = right.find("-").expect("No dash in right assignment");
-            // let right_from = right[..hyphen].parse::<i32>().expect("Right from is not a number");
-            // let right_to = right[hyphen+1..].parse::<i32>().expect("Right to is not a number");
-            let (right_from, right_to) = split_and_parse::<i32>(&right, "-");
-            let right_set: HashSet<i32> = (right_from..=right_to).collect();
-            
-            (left_set.is_superset(&right_set) || right_set.is_superset(&left_set)) as i32
-        })
-        .sum()
-}
-
 fn split_and_parse<T>(input: &str, separator: &str) -> (T, T)
 where T: std::str::FromStr, <T as std::str::FromStr>::Err : std::fmt::Debug
 {
@@ -176,4 +151,35 @@ where T: std::str::FromStr, <T as std::str::FromStr>::Err : std::fmt::Debug
     let right = right.parse::<T>().expect(format!("Right is not a {}", std::any::type_name::<T>()).as_str());
 
     (left, right)
+}
+
+fn day4(input: String) -> Vec<(HashSet<i32>, HashSet<i32>)> {
+    input
+        .split_terminator("\n")
+        .map(|assignments| {
+            let (left, right) = split_and_parse::<String>(&assignments, ",");
+
+            let (left_from, left_to) = split_and_parse::<i32>(&left, "-");
+            let left_set: HashSet<i32> = (left_from..=left_to).collect();
+
+            let (right_from, right_to) = split_and_parse::<i32>(&right, "-");
+            let right_set: HashSet<i32> = (right_from..=right_to).collect();
+            (left_set, right_set)
+        })
+        .collect::<Vec<(HashSet<i32>, HashSet<i32>)>>()
+}
+
+fn day4p1(input: String) -> i32 {
+    day4(input)
+        .iter()
+        .map(|(l, r)| (l.is_superset(&r) || r.is_superset(&l)) as i32) 
+        .sum()
+}
+
+fn day4p2(input: String) -> i32 {
+    day4(input)
+        .iter()
+        .map(|(l, r)| l.intersection(&r).count() + r.intersection(&l).count() > 0)
+        .map(|x| x as i32)
+        .sum()
 }

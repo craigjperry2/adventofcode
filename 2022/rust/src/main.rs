@@ -25,6 +25,7 @@ fn main() -> Result<(), Error> {
     println!("Day 4 Part 2, total pairs: {}", day4p2(load_input(4)));
 
     println!("Day 5 Part 1, top crates: {}", day5p1(load_input(5)));
+    println!("Day 5 Part 2, top crates: {}", day5p2(load_input(5)));
 
     Ok(())
 }
@@ -188,7 +189,7 @@ fn day4p2(input: String) -> i32 {
 }
 
 
-fn day5p1(input: String) -> String {
+fn day5(input: String, part1: bool) -> String {
     let (starting_state, instructions) = input.split_terminator("\n\n").collect_tuple().expect("Failed to parse state and instructions");
 
     let mut state = starting_state
@@ -233,8 +234,10 @@ fn day5p1(input: String) -> String {
         .for_each(|(count, from, to)| {
             // NB: 0 indexed vector but 1 indexed instructions, hence the -1
             let mut x = state[(from - 1) as usize].drain(..count as usize).collect::<Vec<char>>();
-            // place the items in reverse order just as if we moved 1 box at a time instead of the "count" sized batch at once
-            x.reverse();
+            if part1 {
+                // part 1 requires us to place the items in reverse order just as if we moved 1 box at a time
+                x.reverse();
+            }
             state[(to - 1) as usize].splice(0..0, x);
         });
 
@@ -244,4 +247,12 @@ fn day5p1(input: String) -> String {
         .map(|row| row[0])
         .collect::<String>()
 
+}
+
+fn day5p1(input: String) -> String {
+    day5(input, true)
+}
+
+fn day5p2(input: String) -> String {
+    day5(input, false)
 }

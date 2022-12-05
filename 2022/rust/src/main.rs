@@ -1,6 +1,7 @@
 use ferris_says::say;
 use std::{io::{stdout, BufWriter, Error, Write}, collections::{HashMap, HashSet}};
 use itertools::Itertools;
+use regex::Regex;
 
 fn main() -> Result<(), Error> {
     let stdout = stdout();
@@ -22,6 +23,8 @@ fn main() -> Result<(), Error> {
 
     println!("Day 4 Part 1, total pairs: {}", day4p1(load_input(4)));
     println!("Day 4 Part 2, total pairs: {}", day4p2(load_input(4)));
+
+    println!("Day 5 Part 1, top crates: {}", day5p1(load_input(5)));
 
     Ok(())
 }
@@ -182,4 +185,63 @@ fn day4p2(input: String) -> i32 {
         .map(|(l, r)| l.intersection(&r).count() + r.intersection(&l).count() > 0)
         .map(|x| x as i32)
         .sum()
+}
+
+
+fn day5p1(input: String) -> String {
+    let (starting_state, instructions) = input.split_terminator("\n\n").collect_tuple().expect("Failed to parse state and instructions");
+
+    let mut state = starting_state
+        .lines()
+        // discard the last row which contains the column numbers
+        .take(8)
+        // normalise column spacing to allow striding over every 4th char starting from the 0th position
+        .map(|row|
+            row.chars()
+                .skip(1)
+                .collect::<String>()
+        )
+        // stride over every 4th char to parse the given state into a 2d array
+        .map(|row|
+            row.chars()
+                .enumerate()
+                .filter(|(i, _)| i % 4 == 0)
+                .map(|(_, c)| c)
+                .collect::<Vec<char>>()
+        )
+        .collect::<Vec<Vec<char>>>();
+
+    // transpose the state matrix
+    state = (0..state[0].len())
+        .map(|i|
+            state.iter()
+                .map(|row| row[i])
+                .filter(|c| *c != ' ')
+                .collect::<Vec<char>>()
+        )
+        .collect::<Vec<Vec<char>>>();
+
+    // parse and execute each instruction
+    instructions
+        .lines()
+        .map(|instruction| {
+            let re = Regex::new(r"move (\d+) from (\d+) to (\d+)").expect("Failed to compile regex");
+            let captures = re.captures(instruction).expect("Failed to parse instruction");
+            // parse into a 3-tuple of (count, from, to)
+            return (captures[1].parse::<i32>().expect("Failed to parse count"), captures[2].parse::<i32>().expect("Failed to parse from"), captures[3].parse::<i32>().expect("Failed to parse to"));
+        })
+        .for_each(|(count, from, to)| {
+            // NB: 0 indexed vector but 1 indexed instructions, hence the -1
+            let mut x = state[(from - 1) as usize].drain(..count as usize).collect::<Vec<char>>();
+            // place the items in reverse order just as if we moved 1 box at a time instead of the "count" sized batch at once
+            x.reverse();
+            state[(to - 1) as usize].splice(0..0, x);
+        });
+
+    // The top crate of each stack is the final answer
+    state
+        .iter()
+        .map(|row| row[0])
+        .collect::<String>()
+
 }

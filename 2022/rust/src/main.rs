@@ -27,6 +27,9 @@ fn main() -> Result<(), Error> {
     println!("Day 5 Part 1, top crates: {}", day5p1(load_input(5)));
     println!("Day 5 Part 2, top crates: {}", day5p2(load_input(5)));
 
+    println!("Day 6 Part 1, Start marker at: {}", day6p1(load_input(6)));
+    println!("Day 6 Part 2, Start marker at: {}", day6p2(load_input(6)));
+
     Ok(())
 }
 
@@ -255,4 +258,44 @@ fn day5p1(input: String) -> String {
 
 fn day5p2(input: String) -> String {
     day5(input, false)
+}
+
+fn day6p1(input: String) -> i32 {
+    // fold over the input keeping track of the last 4 seen chars and the index
+    input
+        .chars()
+        .enumerate()
+        .map(|(j, x)| (j+1, x)) // is there a better way to enumerate starting at 1 instead of 0 in rust?
+        .fold((false, '\0', '\0', '\0', '\0', 0_usize), |acc, (j, x)| { // use the \0 null char as a null placeholder
+            if acc.0 {
+                // haven't found a neat way to short circuit the fold in rust when i found the answer, hence the flag field and ignoring the remaining input
+                // did mess around with try_fold and ControlFlow but that needed a nightly rust compiler rather than stable to opt into a beta feature
+                return acc
+            }
+            let s = HashSet::from([acc.2, acc.3, acc.4, x]);
+            if j > 3 && s.len() == 4 { // a false positive occurs when the first 3 chars consumed are unique thanks to the init value of \0 being unique
+                return (true, acc.2, acc.3, acc.4, x, j)
+            }
+            (false, acc.2, acc.3, acc.4, x, j)
+        }).5 as i32
+
+        // having done this, i'm not sure reducing over the input was the best approach, i suspect a for loop with a fixed size ring buffer would have been better but would have entailed spending on another dependency crate rather than stdlib (or book-keeping my use of a vecdeque from stdlib)
+}
+
+fn day6p2(input: String) -> i32 {
+    // iterate the input looking for the first 14 contiguous chars that are unique and return the index of the 14th char
+    input
+        .chars()
+        .enumerate()
+        .skip(13)
+        .filter(|(j, x)| {
+            // this is less code but way less efficient than my ring buffer idea at the end of part 1
+            let mut s : HashSet<char> = HashSet::from_iter(input.chars().skip(j-13).take(13));
+            s.insert(*x);
+            s.len() == 14
+        })
+        .map(|(j, _)| j+1) // convert to 1-indexed
+        .next()
+        .expect("Failed to find a match")
+        as i32
 }

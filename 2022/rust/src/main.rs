@@ -30,8 +30,8 @@ fn main() -> Result<(), Error> {
     println!("Day 6 Part 1, Start marker at: {}", day6p1(load_input(6)));
     println!("Day 6 Part 2, Start marker at: {}", day6p2(load_input(6)));
     
-    println!("Day 7 Part 1, Start marker at: {}", day7p1(load_input(7)));
-    println!("Day 7 Part 2, Start marker at: {}", day7p2(load_input(7)));
+    println!("Day 7 Part 1, total size: {}", day7p1(load_input(7)));
+    println!("Day 7 Part 2, total size: {}", day7p2(load_input(7)));
 
     Ok(())
 }
@@ -303,7 +303,7 @@ fn day6p2(input: String) -> i32 {
         as i32
 }
 
-fn day7p1(input: String) -> i64 {
+fn day7(input: String) -> HashMap<String, i64> {
     let mut dirpath_size: HashMap<String, i64> = HashMap::new();
     let mut dirpath: Vec<String> = Vec::new();
 
@@ -344,14 +344,28 @@ fn day7p1(input: String) -> i64 {
             }
         });
 
-        // iterate all the values of dirpath_size, filter out values > 100000, sum the remaining values
         dirpath_size
+}
+
+fn day7p1(input: String) -> i64 {
+    // iterate all the values of dirpath_size, filter out values > 100000, sum the remaining values
+    day7(input)
             .iter()
             .filter(|(_, size)| **size <= 100000)
             .map(|(_, size)| size)
             .sum::<i64>()
 }
 
-fn day7p2(input: String) -> i32 {
-    0
+fn day7p2(input: String) -> i64 {
+    let dirpath_size = day7(input);
+    let total_space = 70000000;
+    let current_used_space = dirpath_size.get("/").expect("Failed to find root dir");
+    let min_free_space = 30000000;
+    let needed_space = min_free_space - (total_space - current_used_space);
+
+    *dirpath_size
+            .iter()
+            .filter(|(_, size)| **size >= needed_space)
+            .map(|(_, size)| size)
+            .min().expect("No dirs large enough were identified")
 }

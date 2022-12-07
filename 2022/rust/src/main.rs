@@ -307,39 +307,43 @@ fn day7(input: String) -> HashMap<String, i64> {
     let mut dirpath_size: HashMap<String, i64> = HashMap::new();
     let mut dirpath: Vec<String> = Vec::new();
 
-    // iterate lines of input
     input
         .lines()
         .for_each(|line| {
-            if line.starts_with("dir") || line.starts_with("$ ls") {
-                // discard the dir and $ ls lines
-                return;
-            }
-            if line.starts_with("$ cd") {
-                // keep track of the current dirpath
-                let dir = line
-                    .split_whitespace()
-                    .nth(2).expect("Invalid cd command format");
-                if dir == ".." {
-                    dirpath.pop();
-                } else {
-                    dirpath.push(dir.to_string());
+            match line {
+                line if line.starts_with("dir") || line.starts_with("$ ls") => {
+                    // discard the dir and $ ls lines
+                    return;
                 }
-            }
-            if line.starts_with(char::is_numeric) {
-                let size = line
-                    .split_whitespace()
-                    .next().expect("Invalid line format")
-                    .parse::<i64>().expect("Invalid number format");
-                
-                // increment the running total for this dir and each parent dir in the path
-                let mut dirpath_local = dirpath.clone();
-                while dirpath_local.len() > 0 {
-                    dirpath_size
-                        .entry(dirpath_local.join("/"))
-                        .and_modify(|count| *count += size)
-                        .or_insert(size);
-                    dirpath_local.pop();
+                line if line.starts_with("$ cd") => {
+                    // keep track of the current dirpath
+                    let dir = line
+                        .split_whitespace()
+                        .nth(2).expect("Invalid cd command format");
+                    if dir == ".." {
+                        dirpath.pop();
+                    } else {
+                        dirpath.push(dir.to_string());
+                    }
+                }
+                line if line.starts_with(char::is_numeric) => {
+                    let size = line
+                        .split_whitespace()
+                        .next().expect("Invalid line format")
+                        .parse::<i64>().expect("Invalid number format");
+                    
+                    // increment the running total for this dir and each parent dir in the path
+                    let mut dirpath_local = dirpath.clone();
+                    while dirpath_local.len() > 0 {
+                        dirpath_size
+                            .entry(dirpath_local.join("/"))
+                            .and_modify(|count| *count += size)
+                            .or_insert(size);
+                        dirpath_local.pop();
+                    }
+                }
+                line => {
+                    panic!("Invalid line format: {}", line);
                 }
             }
         });

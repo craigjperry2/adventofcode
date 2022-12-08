@@ -33,6 +33,9 @@ fn main() -> Result<(), Error> {
     println!("Day 7 Part 1, total size: {}", day7p1(load_input(7)));
     println!("Day 7 Part 2, total size: {}", day7p2(load_input(7)));
 
+    println!("Day 8 Part 1, visible trees: {}", day8p1(load_input(8)));
+    println!("Day 8 Part 2, visible trees: {}", day8p2(load_input(8)));
+
     Ok(())
 }
 
@@ -372,4 +375,79 @@ fn day7p2(input: String) -> i64 {
             .filter(|(_, size)| **size >= needed_space)
             .map(|(_, size)| size)
             .min().expect("No dirs large enough were identified")
+}
+
+fn day8p1(input: String) -> i32 {
+    // split input into lines, collecting in a vector of vectors of i32
+    let tree_grid = input
+        .lines()
+        .map(|line| {
+            line
+                .chars()
+                .map(|c| c.to_digit(10).expect("Invalid input") as i32)
+                .collect::<Vec<i32>>()
+        })
+        .collect::<Vec<Vec<i32>>>();
+
+    let mut visible: HashSet<(i32, i32)> = HashSet::new();
+    let ylen = tree_grid.len();
+    let xlen = tree_grid[0].len();
+
+    // assess each row from west to east, keeping track of the visible trees
+    for y in 0..ylen {
+        let mut tallest_tree_so_far = 0;
+
+        for x in 0..xlen {
+            let t = tree_grid[y][x];
+            if x == 0 || t > tallest_tree_so_far {
+                visible.insert((x as i32, y as i32));
+                tallest_tree_so_far = t;
+            }
+        }
+    }
+
+    // assess each column from north to south, keeping track of the visible trees
+    for x in 0..xlen {
+        let mut tallest_tree_so_far = 0;
+
+        for y in 0..ylen {
+            let t = tree_grid[y][x];
+            if y == 0 || t > tallest_tree_so_far {
+                visible.insert((x as i32, y as i32));
+                tallest_tree_so_far = t;
+            }
+        }
+    }
+
+    // assess each row from east to west, keeping track of the visible trees
+    for y in 0..ylen {
+        let mut tallest_tree_so_far = 0;
+
+        for x in (0..xlen).rev() {
+            let t = tree_grid[y][x];
+            if x == xlen-1 || t > tallest_tree_so_far {
+                visible.insert((x as i32, y as i32));
+                tallest_tree_so_far = t;
+            }
+        }
+    }
+
+    // assess each column from south to north, keeping track of the visible trees
+    for x in 0..xlen {
+        let mut tallest_tree_so_far = 0;
+
+        for y in (0..ylen).rev() {
+            let t = tree_grid[y][x];
+            if y == ylen-1 || t > tallest_tree_so_far {
+                visible.insert((x as i32, y as i32));
+                tallest_tree_so_far = t;
+            }
+        }
+    }
+
+    visible.len() as i32
+}
+
+fn day8p2(input: String) -> i32 {
+    0    
 }

@@ -34,7 +34,7 @@ fn main() -> Result<(), Error> {
     println!("Day 7 Part 2, total size: {}", day7p2(load_input(7)));
 
     println!("Day 8 Part 1, visible trees: {}", day8p1(load_input(8)));
-    println!("Day 8 Part 2, visible trees: {}", day8p2(load_input(8)));
+    println!("Day 8 Part 2, highest score: {}", day8p2(load_input(8)));
 
     Ok(())
 }
@@ -448,6 +448,96 @@ fn day8p1(input: String) -> i32 {
     visible.len() as i32
 }
 
+// vec of all visible trees north of this point
+fn look_north(grid: &Vec<Vec<i32>>, coords: (usize, usize)) -> Vec<(usize, usize)> {
+    let mut visible: Vec<(usize, usize)> = Vec::new();
+    let max_height = grid[coords.1][coords.0];
+
+    for y in (0..coords.1).rev() {
+        let t = grid[y][coords.0];
+        visible.push((coords.0, y));
+        if t >= max_height {
+            break;
+        }
+    }
+
+    visible
+}
+
+// vec of all visible trees south of this point
+fn look_south(grid: &Vec<Vec<i32>>, coords: (usize, usize)) -> Vec<(usize, usize)> {
+    let ylen = grid.len();
+    let mut visible: Vec<(usize, usize)> = Vec::new();
+    let max_height = grid[coords.1][coords.0];
+
+    for y in coords.1+1..ylen {
+        let t = grid[y][coords.0];
+        visible.push((coords.0, y));
+        if t >= max_height {
+            break;
+        }
+    }
+
+    visible
+}
+
+// vec of all visible trees east of this point
+fn look_east(grid: &Vec<Vec<i32>>, coords: (usize, usize)) -> Vec<(usize, usize)> {
+    let xlen = grid[0].len();
+    let mut visible: Vec<(usize, usize)> = Vec::new();
+    let max_height = grid[coords.1][coords.0];
+
+    for x in coords.0+1..xlen {
+        let t = grid[coords.1][x];
+        visible.push((x, coords.1));
+        if t >= max_height {
+            break;
+        }
+    }
+
+    visible
+}
+
+// vec of all visible trees west of this point
+fn look_west(grid: &Vec<Vec<i32>>, coords: (usize, usize)) -> Vec<(usize, usize)> {
+    let mut visible: Vec<(usize, usize)> = Vec::new();
+    let max_height = grid[coords.1][coords.0];
+
+    for x in (0..coords.0).rev() {
+        let t = grid[coords.1][x];
+        visible.push((x, coords.1));
+        if t >= max_height {
+            break;
+        }
+    }
+
+    visible
+}
+
 fn day8p2(input: String) -> i32 {
-    0    
+    let tree_grid = input
+        .lines()
+        .map(|line| {
+            line
+                .chars()
+                .map(|c| c.to_digit(10).expect("Invalid input") as i32)
+                .collect::<Vec<i32>>()
+        })
+        .collect::<Vec<Vec<i32>>>();
+    
+    tree_grid
+        .iter()
+        .enumerate()
+        .map(|(y, row)|
+                row.iter()
+                .enumerate()
+                .map(|(x, _)|
+                    look_north(&tree_grid, (x, y)).len() *
+                    look_west(&tree_grid, (x, y)).len() *
+                    look_south(&tree_grid, (x, y)).len() *
+                    look_east(&tree_grid, (x, y)).len()
+                )
+                .max().unwrap() as i32
+        )
+        .max().unwrap()
 }

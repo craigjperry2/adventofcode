@@ -1,5 +1,5 @@
 use ferris_says::say;
-use std::{io::{stdout, BufWriter, Error, Write}, collections::{HashMap, HashSet}};
+use std::{io::{stdout, BufWriter, Error, Write}, collections::{HashMap, HashSet}, str::FromStr, ops::Sub};
 use itertools::Itertools;
 use regex::Regex;
 
@@ -35,6 +35,9 @@ fn main() -> Result<(), Error> {
 
     println!("Day 8 Part 1, visible trees: {}", day8p1(load_input(8)));
     println!("Day 8 Part 2, highest score: {}", day8p2(load_input(8)));
+
+    println!("Day 9 Part 1, positions visited: {}", day9p1(load_input(9)));
+    println!("Day 9 Part 2, positions visited: {}", day9p2(load_input(9)));
 
     Ok(())
 }
@@ -540,4 +543,115 @@ fn day8p2(input: String) -> i32 {
                 .max().unwrap() as i32
         )
         .max().unwrap()
+}
+
+#[derive(Debug, PartialEq)]
+enum DirectionDistanceInstruction {
+    U(i32),
+    D(i32),
+    L(i32),
+    R(i32),
+}
+
+impl FromStr for DirectionDistanceInstruction {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let dir = s.chars().nth(0).expect("Invalid direction");
+        let dist = s[2..].parse::<i32>().expect("Invalid distance");
+        match dir {
+            'U' => Ok(DirectionDistanceInstruction::U(dist)),
+            'D' => Ok(DirectionDistanceInstruction::D(dist)),
+            'L' => Ok(DirectionDistanceInstruction::L(dist)),
+            'R' => Ok(DirectionDistanceInstruction::R(dist)),
+            _ => Err(()),
+        }
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
+struct Point(i32, i32);
+
+impl Sub for Point {
+    type Output = Point;
+
+    fn sub(self, other: Point) -> Point {
+        Point(self.0 - other.0, self.1 - other.1)
+    }
+}
+
+fn move_tail(head: Point, tail: Point) -> Point {
+    match head - tail {
+        // Move diagonally up+left
+        Point(-2, 1) | Point(-2, 2) | Point(-1, 2) => Point(tail.0 - 1, tail.1 + 1),
+        // Move diagonally up+right
+        Point(1, 2) | Point(2, 2) | Point(2, 1) => Point(tail.0 + 1, tail.1 + 1),
+        // Move diagonally down+right
+        Point(2, -1) | Point(2, -2) | Point(1, -2) => Point(tail.0 + 1, tail.1 - 1),
+        // Move diagonally down+left
+        Point(-1, -2) | Point(-2, -2) | Point(-2, -1) => Point(tail.0 - 1, tail.1 - 1),
+        // Move up
+        Point(0, 2) => Point(tail.0, tail.1 + 1),
+        // Move right
+        Point(2, 0) => Point(tail.0 + 1, tail.1),
+        // Move down
+        Point(0, -2) => Point(tail.0, tail.1 - 1),
+        // Move left
+        Point(-2, 0) => Point(tail.0 - 1, tail.1),
+        _ => tail
+    }
+}
+
+fn day9p1(input: String) -> i32 {
+    let mut visited: HashSet<Point> = HashSet::new();
+    let mut head = Point(0, 0);
+    let mut tail = Point(0, 0);
+    visited.insert(tail);  // the 's' position
+
+    input
+        .lines()
+        .for_each(|line| {
+            line
+                .split(",")
+                .map(|s| {
+                    s.parse().expect("Invalid instruction")
+                })
+                .for_each(|instruction| {
+                    match instruction {
+                        DirectionDistanceInstruction::U(dist) => {
+                            for _ in 0..dist {
+                                head.1 += 1;
+                                tail = move_tail(head, tail);
+                                visited.insert(tail);
+                            }
+                        }
+                        DirectionDistanceInstruction::D(dist) => {
+                            for _ in 0..dist {
+                                head.1 -= 1;
+                                tail = move_tail(head, tail);
+                                visited.insert(tail);
+                            }
+                        }
+                        DirectionDistanceInstruction::L(dist) => {
+                            for _ in 0..dist {
+                                head.0 -= 1;
+                                tail = move_tail(head, tail);
+                                visited.insert(tail);
+                            }
+                        }
+                        DirectionDistanceInstruction::R(dist) => {
+                            for _ in 0..dist {
+                                head.0 += 1;
+                                tail = move_tail(head, tail);
+                                visited.insert(tail);
+                            }
+                        }
+                    }
+                });
+        });
+    visited.len() as i32
+}
+
+fn day9p2(_input: String) -> i32 {
+    0    
 }

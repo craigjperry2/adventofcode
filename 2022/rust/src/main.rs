@@ -40,7 +40,8 @@ fn main() -> Result<(), Error> {
     println!("Day 9 Part 2, positions visited: {}", day9p2(load_input(9)));
 
     println!("Day 10 Part 1, sum of signals: {}", day10p1(load_input(10)));
-    println!("Day 10 Part 2, sum of signals: {}", day10p2(load_input(10)));
+    println!("Day 10 Part 2, letters: ");
+    day10p2(load_input(10));
 
     Ok(())
 }
@@ -711,9 +712,18 @@ fn day9p2(input: String) -> i32 {
 
 // day10p1
 fn day10p1(input: String) -> i32 {
+    let trace: HashMap<i32, i32> = trace_program(input);
+    (20..=220).step_by(40)
+        .map(|i| {
+            i * trace.get(&(i-1)).expect(format!("Invalid clock: {}", i).as_str())
+        }).sum()
+}
+
+fn trace_program(input: String) -> HashMap<i32, i32>{
     let mut clock = 0;
     let mut last_value = 1;
     let mut trace: HashMap<i32, i32> = HashMap::new();
+    trace.insert(clock, last_value);
 
     input
         .lines()
@@ -730,13 +740,19 @@ fn day10p1(input: String) -> i32 {
                 trace.insert(clock, last_value);
             };
         });
-
-    (20..=220).step_by(40)
-        .map(|i| {
-            i * trace.get(&(i-1)).expect(format!("Invalid clock: {}", i).as_str())
-        }).sum()
+    trace
 }
 
-fn day10p2(_input: String) -> i32 {
-    0
+fn day10p2(input: String) {
+    let trace: HashMap<i32, i32> = trace_program(input);
+
+    (0..=239)
+        .map(|pos| {
+            let v = *trace.get(&pos).expect(format!("Failed to unwrap trace value for clock {}", pos).as_str());
+            if v-1 <= (pos%40) && v+1 >= (pos%40) { "#" } else { "." }
+        })
+        .chunks(40)
+        .into_iter()
+        .map(|c| c.collect::<String>())
+        .for_each(|l| println!("{}", l));
 }

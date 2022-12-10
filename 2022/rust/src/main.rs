@@ -652,6 +652,56 @@ fn day9p1(input: String) -> i32 {
     visited.len() as i32
 }
 
-fn day9p2(_input: String) -> i32 {
-    0    
+fn update_knots(knots: &mut Vec<Point>, dist: i32, visited: &mut HashSet<Point>, f: impl Fn(&mut Point)) {
+    for _ in 0..dist {
+        f(&mut knots[0]);
+        (1..10).for_each(|i| {
+            knots[i] = move_tail(knots[i-1], knots[i]);
+        });
+        visited.insert(knots[9]);
+    }
+}
+
+fn day9p2(input: String) -> i32 {
+    let mut knots = vec![
+        Point(0, 0), // 0 = head
+        Point(0, 0),
+        Point(0, 0),
+        Point(0, 0),
+        Point(0, 0),
+        Point(0, 0),
+        Point(0, 0),
+        Point(0, 0),
+        Point(0, 0),
+        Point(0, 0), // 9 = tail
+    ];
+    let mut visited: HashSet<Point> = HashSet::new();
+    visited.insert(knots[9]);  // the 's' position
+
+    input
+        .lines()
+        .for_each(|line| {
+            line
+                .split(",")
+                .map(|s| {
+                    s.parse().expect("Invalid instruction")
+                })
+                .for_each(|instruction| {
+                    match instruction {
+                        DirectionDistanceInstruction::U(dist) => {
+                            update_knots(&mut knots, dist, &mut visited, |p| p.1 += 1);
+                        }
+                        DirectionDistanceInstruction::D(dist) => {
+                            update_knots(&mut knots, dist, &mut visited, |p| p.1 -= 1);
+                        }
+                        DirectionDistanceInstruction::L(dist) => {
+                            update_knots(&mut knots, dist, &mut visited, |p| p.0 -= 1);
+                        }
+                        DirectionDistanceInstruction::R(dist) => {
+                            update_knots(&mut knots, dist, &mut visited, |p| p.0 += 1);
+                        }
+                    }
+                });
+        });
+    visited.len() as i32
 }

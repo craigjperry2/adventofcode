@@ -1,6 +1,6 @@
 use ferris_says::say;
-use std::{io::{stdout, BufWriter, Error, Write}, collections::{HashMap, HashSet}, str::FromStr, ops::Sub};
-use itertools::Itertools;
+use std::{io::{stdout, BufWriter, Error, Write}, collections::{HashMap, HashSet}, str::FromStr, ops::{Sub, Add, Mul}};
+use itertools::{Itertools};
 use regex::Regex;
 
 fn main() -> Result<(), Error> {
@@ -42,6 +42,9 @@ fn main() -> Result<(), Error> {
     println!("Day 10 Part 1, sum of signals: {}", day10p1(load_input(10)));
     println!("Day 10 Part 2, letters: ");
     day10p2(load_input(10));
+
+    println!("Day 11 Part 1, level of monkey business: {}", day11p1(load_input(11)));
+    println!("Day 11 Part 2, level of monkey business: {}", day11p2(load_input(11)));
 
     Ok(())
 }
@@ -710,7 +713,6 @@ fn day9p2(input: String) -> i32 {
     visited.len() as i32
 }
 
-// day10p1
 fn day10p1(input: String) -> i32 {
     let trace: HashMap<i32, i32> = trace_program(input);
     (20..=220).step_by(40)
@@ -755,4 +757,77 @@ fn day10p2(input: String) {
         .into_iter()
         .map(|c| c.collect::<String>())
         .for_each(|l| println!("{}", l));
+}
+
+type ItemWorryLevel = i32;
+
+#[derive(Debug)]
+struct Monkey {
+    pub item_levels: Vec<ItemWorryLevel>,
+    pub operand: ItemWorryLevel,
+    pub operation: fn(ItemWorryLevel, ItemWorryLevel) -> ItemWorryLevel,
+    pub test: ItemWorryLevel,
+    pub next_true: ItemWorryLevel,
+    pub next_false: ItemWorryLevel,
+    pub inspected: i32,
+}
+
+impl FromStr for Monkey {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let lines = s.lines().collect::<Vec<&str>>();
+        let m = Monkey {
+            item_levels: lines[1].split_once(": ").expect("Failed to parse starting items").1
+                    .split_terminator(", ").map(|i| i.parse().expect("Failed to parse monkey item"))
+                    .collect(),
+            operand: lines[2].split_once(&['+', '*']).expect("Failed to parse operation").1[1..].parse::<i32>().unwrap_or(0),
+            operation: if lines[2].contains(" + ") { ItemWorryLevel::add } else { ItemWorryLevel::mul },
+            test: lines[3].split_once("by ").expect("Failed to parse test").1.parse().expect("Failed to parse test operand"),
+            next_true: lines[4].split_once("monkey ").expect("Failed to parse true action").1.parse().expect("Failed to parse true action operand"),
+            next_false: lines[5].split_once("monkey ").expect("Failed to parse false action").1.parse().expect("Failed to parse false action operand"),
+            inspected: 0,
+        };
+        Ok(m)
+    }
+}
+
+type Monkeys = Vec<Monkey>;
+
+fn day11p1(input: String) -> i32 {
+    let mut monkeys: Monkeys = input
+        .split_terminator("\n\n")
+        .map(|m| m.parse().expect("Failed to parse monkey"))
+        .collect();
+    
+    for _ in 1..=20 {
+        for j in 0..monkeys.len() {
+            for _ in 0..monkeys[j].item_levels.len() {
+                let mut item = monkeys[j].item_levels.remove(0);
+                monkeys[j].inspected += 1;
+                item = (monkeys[j].operation)(item,
+                    if monkeys[j].operand == 0 {item} else {monkeys[j].operand}
+                );
+                item /= 3;
+                let next;
+                if item % monkeys[j].test == 0 {
+                    next = monkeys[j].next_true;
+                } else {
+                    next = monkeys[j].next_false;
+                }
+                monkeys[next as usize].item_levels.push(item);
+            }
+        }
+    }
+
+
+    monkeys.iter()
+        .sorted_by(|a, b| b.inspected.cmp(&a.inspected)) // TODO verify ordering
+        .take(2)
+        .map(|m| m.inspected)
+        .product()
+}
+
+fn day11p2(_input: String) -> i32 {
+    0
 }

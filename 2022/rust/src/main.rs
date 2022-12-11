@@ -759,7 +759,8 @@ fn day10p2(input: String) {
         .for_each(|l| println!("{}", l));
 }
 
-type ItemWorryLevel = i32;
+type ItemWorryLevel = i64;
+type MonkeyId = usize;
 
 #[derive(Debug)]
 struct Monkey {
@@ -767,8 +768,8 @@ struct Monkey {
     pub operand: ItemWorryLevel,
     pub operation: fn(ItemWorryLevel, ItemWorryLevel) -> ItemWorryLevel,
     pub test: ItemWorryLevel,
-    pub next_true: ItemWorryLevel,
-    pub next_false: ItemWorryLevel,
+    pub next_true: MonkeyId,
+    pub next_false: MonkeyId,
     pub inspected: i32,
 }
 
@@ -781,7 +782,7 @@ impl FromStr for Monkey {
             item_levels: lines[1].split_once(": ").expect("Failed to parse starting items").1
                     .split_terminator(", ").map(|i| i.parse().expect("Failed to parse monkey item"))
                     .collect(),
-            operand: lines[2].split_once(&['+', '*']).expect("Failed to parse operation").1[1..].parse::<i32>().unwrap_or(0),
+            operand: lines[2].split_once(&['+', '*']).expect("Failed to parse operation").1[1..].parse::<i64>().unwrap_or(0),
             operation: if lines[2].contains(" + ") { ItemWorryLevel::add } else { ItemWorryLevel::mul },
             test: lines[3].split_once("by ").expect("Failed to parse test").1.parse().expect("Failed to parse test operand"),
             next_true: lines[4].split_once("monkey ").expect("Failed to parse true action").1.parse().expect("Failed to parse true action operand"),
@@ -794,11 +795,23 @@ impl FromStr for Monkey {
 
 type Monkeys = Vec<Monkey>;
 
-fn day11p1(input: String) -> i32 {
-    let mut monkeys: Monkeys = input
+fn parse_monkeys(input: String) -> Monkeys {
+    input
         .split_terminator("\n\n")
         .map(|m| m.parse().expect("Failed to parse monkey"))
-        .collect();
+        .collect()
+}
+
+fn report_monkeys(monkeys: &Monkeys) -> i64 {
+    monkeys.iter()
+        .sorted_by(|a, b| b.inspected.cmp(&a.inspected))
+        .take(2)
+        .map(|m| m.inspected as i64)
+        .product()
+}
+    
+fn day11p1(input: String) -> i64 {
+    let mut monkeys = parse_monkeys(input);
     
     for _ in 1..=20 {
         for j in 0..monkeys.len() {
@@ -815,19 +828,42 @@ fn day11p1(input: String) -> i32 {
                 } else {
                     next = monkeys[j].next_false;
                 }
-                monkeys[next as usize].item_levels.push(item);
+                monkeys[next].item_levels.push(item);
             }
         }
     }
 
-
-    monkeys.iter()
-        .sorted_by(|a, b| b.inspected.cmp(&a.inspected)) // TODO verify ordering
-        .take(2)
-        .map(|m| m.inspected)
-        .product()
+    report_monkeys(&monkeys)
 }
 
-fn day11p2(_input: String) -> i32 {
-    0
+fn day11p2(input: String) -> i64 {
+    let mut monkeys = parse_monkeys(input);
+
+    let factor = monkeys.iter().map(|m| m.test).product::<i64>();
+    
+    // I spent a lot of time fighting rust on this problem, this is the first problem where ownership got in my way. My initial idea
+    // was to .iter() and accumulate, the same pattern i've used in pretty much all the other problems but there were two borrows of
+    // monkeys vector and my rust-fu ain't strong enough to do it. I still think this general idea is likely expressable as an iter()
+    // with more rust experience
+    for _ in 1..=10000 {
+        for j in 0..monkeys.len() {
+            for _ in 0..monkeys[j].item_levels.len() {
+                let mut item = monkeys[j].item_levels.remove(0);
+                monkeys[j].inspected += 1;
+                item %= factor;  // I needed a chat for this, i didn't figure this out myself :-(
+                item = (monkeys[j].operation)(item,
+                    if monkeys[j].operand == 0 {item} else {monkeys[j].operand}
+                );
+                let next: MonkeyId;
+                if item % monkeys[j].test == 0 {
+                    next = monkeys[j].next_true;
+                } else {
+                    next = monkeys[j].next_false;
+                }
+                monkeys[next].item_levels.push(item);
+            }
+        }
+    }
+
+    report_monkeys(&monkeys)
 }

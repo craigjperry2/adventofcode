@@ -896,7 +896,14 @@ fn day12p1(input: String) -> i32 {
             .collect::<Vec<i32>>())
         .collect::<HeightMap>();
     
-    // Breadth first search
+    *bfs(start, end, &height_map)
+        .iter()
+        .sorted()
+        .next()
+        .unwrap()
+}
+
+fn bfs(start: Position, end: Position, height_map: &HeightMap) -> Vec<i32> {
     let mut paths: Vec<i32> = vec![];
     let mut queue: Vec<(Position, i32)> = vec![(start, 0)];
     let mut visited: HashSet<Position> = HashSet::new();
@@ -927,10 +934,37 @@ fn day12p1(input: String) -> i32 {
             continue;
         }
     }
-    paths.sort();
-    paths[0]
+    paths
 }
 
-fn day12p2(_input: String) -> i32 {
-    0
+fn day12p2(input: String) -> i32 {
+    let mut starting_points: Vec<Position> = vec![];
+    let mut end: Position = (0, 0);
+    let height_map = input
+        .lines()
+        .enumerate()
+        .map(|(y, l)| l.chars()
+            .enumerate()
+            .map(|(x, c)| {
+                if c == 'S' || c == 'a' {
+                    starting_points.push((x as i32, y as i32));
+                    0 // a
+                } else if c == 'E' {
+                    end = (x as i32, y as i32);
+                    25 // z
+                } else {
+                    c as i32 - 97
+                }
+            })
+            .collect::<Vec<i32>>())
+        .collect::<HeightMap>();
+    
+
+    starting_points
+        .iter()
+        .map(|s| bfs(*s, end, &height_map))
+        .flatten()
+        .sorted()
+        .min()
+        .unwrap()
 }

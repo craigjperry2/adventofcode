@@ -46,6 +46,9 @@ fn main() -> Result<(), Error> {
     println!("Day 11 Part 1, level of monkey business: {}", day11p1(load_input(11)));
     println!("Day 11 Part 2, level of monkey business: {}", day11p2(load_input(11)));
 
+    println!("Day 12 Part 1, fewest steps: {}", day12p1(load_input(12)));
+    println!("Day 12 Part 2, fewest steps: {}", day12p2(load_input(12)));
+
     Ok(())
 }
 
@@ -866,4 +869,68 @@ fn day11p2(input: String) -> i64 {
     }
 
     report_monkeys(&monkeys)
+}
+
+type HeightMap = Vec<Vec<i32>>;
+type Position = (i32, i32);
+
+fn day12p1(input: String) -> i32 {
+    let mut start: Position = (0, 0);
+    let mut end: Position = (0, 0);
+    let height_map = input
+        .lines()
+        .enumerate()
+        .map(|(y, l)| l.chars()
+            .enumerate()
+            .map(|(x, c)| {
+                if c == 'S' {
+                    start = (x as i32, y as i32);
+                    0 // a
+                } else if c == 'E' {
+                    end = (x as i32, y as i32);
+                    25 // z
+                } else {
+                    c as i32 - 97
+                }
+            })
+            .collect::<Vec<i32>>())
+        .collect::<HeightMap>();
+    
+    // Breadth first search
+    let mut paths: Vec<i32> = vec![];
+    let mut queue: Vec<(Position, i32)> = vec![(start, 0)];
+    let mut visited: HashSet<Position> = HashSet::new();
+    while !queue.is_empty() {
+        let (pos, length) = queue.pop().unwrap();
+        if pos == end {
+            paths.push(length);
+        } else if !visited.contains(&pos) {
+            visited.insert(pos);
+            let (x, y) = pos;
+            let height = height_map[y as usize][x as usize];
+            let mut next = vec![];
+            if y > 0 && height_map[y as usize - 1][x as usize] <= height + 1 {
+                next.push(((x, y-1), length + 1));
+            }
+            if y < height_map.len() as i32 - 1 && height_map[y as usize + 1][x as usize] <= height + 1 {
+                next.push(((x, y+1), length + 1));
+            }
+            if x > 0 && height_map[y as usize][x as usize - 1] <= height + 1 {
+                next.push(((x-1, y), length + 1));
+            }
+            if x < height_map[y as usize].len() as i32 - 1 && height_map[y as usize][x as usize + 1] <= height + 1 {
+                next.push(((x+1, y), length + 1));
+            }
+            queue.splice(0..0, next);
+        } else {
+            // already visited
+            continue;
+        }
+    }
+    paths.sort();
+    paths[0]
+}
+
+fn day12p2(_input: String) -> i32 {
+    0
 }

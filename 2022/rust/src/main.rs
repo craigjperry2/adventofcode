@@ -12,6 +12,7 @@ fn main() -> Result<(), Error> {
     say(message.as_bytes(), width, &mut writer)?;
     writer.flush()?;
 
+    if false {
     println!("Day 1 Part 1, max calories: {}", day1p1(load_input(1)));
     println!( "Day 1 Part 2, total calories from top 3 elves: {}", day1p2(load_input(1)));
 
@@ -48,6 +49,9 @@ fn main() -> Result<(), Error> {
 
     println!("Day 12 Part 1, fewest steps: {}", day12p1(load_input(12)));
     println!("Day 12 Part 2, fewest steps: {}", day12p2(load_input(12)));
+    }
+    println!("Day 13 Part 1, pairs in order: {}", day13p1(load_input(13)));
+    println!("Day 13 Part 2, pairs in order: {}", day13p2(load_input(13)));
 
     Ok(())
 }
@@ -967,4 +971,12 @@ fn day12p2(input: String) -> i32 {
         .sorted()
         .min()
         .unwrap()
+}
+
+fn day13p1(input: String) -> i32 {
+    0
+}
+
+fn day13p2(_input: String) -> i32 {
+    0
 }

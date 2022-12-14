@@ -1,5 +1,5 @@
 use ferris_says::say;
-use std::{io::{stdout, BufWriter, Error, Write}, collections::{HashMap, HashSet}, str::FromStr, ops::{Sub, Add, Mul}};
+use std::{io::{stdout, BufWriter, Error, Write}, collections::{HashMap, HashSet}, str::{FromStr, Chars}, ops::{Sub, Add, Mul}, vec};
 use itertools::{Itertools};
 use regex::Regex;
 
@@ -974,9 +974,106 @@ fn day12p2(input: String) -> i32 {
 }
 
 fn day13p1(input: String) -> i32 {
-    0
+    input
+        .split("\n\n")
+        .map(|s| {
+            let pair = s.trim().split_once("\n").expect("failed to parse pair");
+            // this will just return head for empty list, instead do recursive explore of tree
+            let left = if let Nested::List(l) = parse_lists(&mut pair.0.chars()) {
+                l
+            } else {
+                panic!("failed to parse left");
+            };
+            let right = if let Nested::List(r) = parse_lists(&mut pair.1.chars()) {
+                r
+            } else {
+                panic!("failed to parse right");
+            };
+            left.iter()
+                .zip(right.iter())
+                .map(|(l, r)| {
+                    if let Nested::Value(lv) = l {
+                        if let Nested::Value(rv) = r {
+                            if lv == rv {
+                                true
+                            } else {
+                                return lv < rv
+                            }
+                        } else {
+                            panic!("failed to parse right value");
+                        }
+                    } else {
+                        panic!("failed to parse left value");
+                    }
+                })
+                .all(|i| i)
+        })
+        .zip(1..)  // enumerate starting at 1
+        .filter(|(inOrder, i)| *inOrder)
+        .map(|(_, i)| i)
+        .sum::<i32>()
+}
+
+#[derive(Debug)]
+enum Nested {
+    Head,
+    List(Vec<Nested>),
+    Value(i32),
+}
+
+fn parse_lists(stream: &mut Chars) -> Nested {
+    let mut stack = vec![];
+    // let mut list = Nested::List(vec![]);
+    let mut list = Nested::Head;
+
+    while let Some(c) = stream.next() {
+        match c {
+            '[' => {
+                match list {
+                    // Nested::List(ref mut l) => l.push(parse_lists(stream)),
+                    Nested::Head => list = Nested::List(vec![]),
+                    Nested::List(ref mut l) => l.push(parse_lists(stream)),
+                    _ => panic!("unexpected ["),
+                }
+            },
+            ']' => {
+                if !stack.is_empty() {
+                    let n = String::from_iter(stack).parse::<i32>().expect("Failed to parse number before ]");
+                    stack = vec![];
+                    match list {
+                        Nested::Head => list = Nested::List(vec![Nested::Value(n)]),
+                        Nested::List(ref mut l) => l.push(Nested::Value(n)),
+                        _ => panic!("unexpected ] after number"),
+                    }
+                } else {
+                    match list {
+                        Nested::Head => list = Nested::List(vec![]),
+                        Nested::List(_) => (),
+                        _ => panic!("unexpected ]"),
+                    }
+                }
+            },
+            ',' => {
+                if !stack.is_empty() {
+                    let n = String::from_iter(stack).parse::<i32>().expect("Failed to parse number before ,");
+                    stack = vec![];
+                    match list {
+                        Nested::Head => list = Nested::List(vec![Nested::Value(n)]),
+                        Nested::List(ref mut l) => l.push(Nested::Value(n)),
+                        _ => panic!("unexpected ,"),
+                    }
+                } 
+            },
+            '0'..='9' => {
+                stack.push(c);
+            },
+            _ => panic!("unexpected char {}", c),
+        }
+    }
+    return list;
 }
 
 fn day13p2(_input: String) -> i32 {
     0
 }
+

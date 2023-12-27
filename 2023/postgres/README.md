@@ -32,3 +32,6 @@ visualisation there and i find that handy!
 * I had to add the Markdown plugin - that wasn't installed automatically like IDEA.
 * I had to add the docker plugin to get in-IDE views of the podman container. I don't find the intellij docker plugin
   all that useful but sometimes the show files view is handy.
+* I had to add the terminal plugin - that seems extreme not to include that by default
+
+End of experiment... i went back to vanilla intellij idea :-)

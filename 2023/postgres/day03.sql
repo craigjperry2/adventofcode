@@ -181,3 +181,96 @@ part_numbers as (
 
 -- Calculate answer for star 1
 select sum(part) from part_numbers;
+
+
+--[ Part 2 ]-------------------------------------------------------------------
+
+WITH enumerated AS (
+    SELECT row_number() over () AS y, line
+    FROM day3
+),
+rows AS (
+    SELECT y, regexp_split_to_table(line, '') AS n
+    FROM enumerated
+),
+cols AS (
+    SELECT y, row_number() over (partition by y) AS x, n
+    FROM rows
+),
+locations as (
+    select y, x, n
+    from cols
+    where n <> '.'
+),
+digits as (
+    select *
+    from locations
+    where n >= '0'
+),
+gears as (
+    select *
+    from locations
+    where n = '*'
+),
+adjacent_gears as (
+    select d.*, s.x as gear_x, s.y as gear_y
+    from digits d inner join gears s
+    on d.x between s.x - 1 and s.x + 1
+    and d.y between s.y - 1 and s.y + 1
+    order by s.y, s.x, d.y, d.x
+),
+leftbounds_gears as (
+    select row_number() over () as r, c.y, c.x::int + 1 as x, gear_x, gear_y
+    from adjacent_gears a inner join lateral (
+        select y, case
+            when x = 1 and n in ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9') then 0
+            else x
+        end as x
+        from cols c1
+        where x <= a.x and y = a.y and (x = 1 or n not in ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9'))
+        group by y, x, n
+        order by x desc
+        limit 1
+    ) c on true
+    group by c.y, c.x, gear_x, gear_y
+    order by c.y, c.x
+),
+rightbounds_gears as (
+    select row_number() over () as r, c.y, c.x::int - 1 as x, gear_x, gear_y
+    from adjacent_gears a inner join lateral (
+        select y, case
+            when x = 140 and n in ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9') then 141
+            else x
+        end as x
+        from cols
+        where x >= a.x and y = a.y and (x = 140 or n not in ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9'))
+        group by y, x, n
+        order by x asc
+        limit 1
+    ) c on true
+    group by c.y, c.x, gear_x, gear_y
+    order by c.y, c.x
+),
+offsets_gears as (
+    select array_agg(l.y) as y, array_agg(l.x) as x, array_agg((r.x - l.x) + 1) as len, l.gear_x, l.gear_y
+    from leftbounds_gears l full outer join rightbounds_gears r
+        on l.r = r.r
+    group by l.gear_y, l.gear_x
+    having array_length(array_agg(l.x), 1) = 2
+),
+gear_ratios as (
+    select part1, part2
+    from (
+        select
+            substring (e1.line from o.x[1] for o.len[1])::int as part1,
+            substring (e2.line from o.x[2] for o.len[2])::int as part2
+        from offsets_gears o, enumerated e1, enumerated e2
+        where o.y[1] = e1.y
+        and o.y[2] = e2.y
+    )
+),
+part_numbers as (
+    select part1 * part2 as ratio
+    from gear_ratios
+)
+select sum(ratio) from part_numbers;

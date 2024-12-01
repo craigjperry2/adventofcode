@@ -1,5 +1,5 @@
-use aoc24::add;
+use aoc24::read_day_input;
 
 fn main() {
-    println!("2 + 2 = {}", add(2, 2));
+    println!("day input:\n{}", read_day_input(1));
 }

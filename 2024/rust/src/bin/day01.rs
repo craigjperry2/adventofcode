@@ -25,10 +25,24 @@ fn main() {
     right.sort();
 
     // calculate absolute difference between left and right
-    let diffs = left.into_iter().zip(right).map(|(l, r)| (l - r).abs());
+    let diffs = left.clone().into_iter().zip(right.clone()).map(|(l, r)| (l - r).abs());
     // println!("Differences: {}", diffs.nth(0).unwrap());
 
     // sum the differences
     let sum: i32 = diffs.sum();
-    println!("Sum: {}", sum);
+    println!("Part 1: {}", sum);
+
+
+    // -------------------- PART 2 --------------------
+
+    let mut similarity = 0;
+
+    // iterate left, count number of occurances of left in right
+    for l in left {
+        let count = right.iter().filter(|&r| r == &l).count();
+        similarity += l * count as i32;
+    }
+
+    println!("Part 2: {}", similarity);
+
 }

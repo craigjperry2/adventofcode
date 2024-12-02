@@ -16,7 +16,7 @@ fn main() {
     // for each report, compare each level to the previous and emit the difference
     let level_diffs: Vec<Vec<i32>> = level_reports
         .iter()
-        .map(|report| report.iter().tuple_windows().map(|(a, b)| b - a).collect())  // tuple_windows() was a handy find!
+        .map(|report| report.iter().tuple_windows().map(|(a, b)| b - a).collect()) // tuple_windows() was a handy find!
         .collect();
 
     // println!("Part 1: {:?}", &level_diffs[0]);
@@ -29,4 +29,63 @@ fn main() {
         .count();
 
     println!("Part 1: {}", part1_count);
+
+    let part2_count = level_reports
+        .iter()
+        // for each report, create a list containing the report and every combination of the report with 1 element deleted
+        .map(|report| {
+            let mut damped_reports = Vec::new();
+            damped_reports.push(report.clone());
+            damped_reports.extend(
+                (0..report.len())
+                    .map(|i| {
+                        report
+                            .iter()
+                            .enumerate()
+                            .filter(|(j, _)| *j != i)
+                            .map(|(_, x)| *x)
+                            .collect::<Vec<i32>>()
+                    })
+                    .collect::<Vec<Vec<i32>>>(),
+            );
+            damped_reports
+        })
+        // .map(|report| {
+        //     println!("{:?}", report);
+        //     report
+        // })
+        // For each report, calculate the difference between each element
+        .map(|reports|
+                // for each report, calculate the difference between each element
+                reports
+                    .iter()
+                    .map(|report| {
+                        report
+                            .iter()
+                            .tuple_windows()
+                            .map(|(a, b)| b - a)
+                            .collect::<Vec<i32>>()
+                    })
+                    .collect::<Vec<Vec<i32>>>())
+        // select any reports which meet the criteria
+        .filter(|reports| {
+            reports
+                .iter()
+                .any(|report| is_all_same_sign(report) && is_between_1_and_3(report))
+        })
+        // .map(|report| {
+        //     println!("{:?}", report);
+        //     report
+        // })
+        .count();
+
+    println!("Part 2: {}", part2_count);
+}
+
+fn is_all_same_sign(vec: &Vec<i32>) -> bool {
+    vec.iter().all(|&x| x > 0) || vec.iter().all(|&x| x < 0)
+}
+
+fn is_between_1_and_3(vec: &Vec<i32>) -> bool {
+    vec.iter().all(|&x| x.abs() >= 1 && x.abs() <= 3)
 }

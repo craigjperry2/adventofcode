@@ -24,3 +24,14 @@ Remind myself of stuff i learned before:
   * The `dotenv` crate is unmaintained and has a sec advisory - use dotenvy
     instead. Or just don't use dotenv, it's not really needed here
 
+## Journal
+
+What did i learn this year?
+
+* Day 1:
+  * Don't tidy up the solution, leave the raw version that works - better for
+  learning from than a tidied up version
+* Day 2:
+  * Some more experienced rust developers exploited some nice features of the
+  language to come up with neat solutions, e.g. https://github.com/jamincan/aoc2024/blob/main/src/day1.rs
+  * The debugger interface via VSCode isn't that useful out of the box, might compare with rust rover tomorrow

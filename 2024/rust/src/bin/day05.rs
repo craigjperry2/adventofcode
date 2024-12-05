@@ -1,4 +1,6 @@
 use aoc24::read_day_input;
+use std::iter::Map;
+use std::str::Lines;
 use std::{
     collections::{HashMap, HashSet},
     ops::Div,
@@ -8,68 +10,38 @@ fn main() {
     let input = read_day_input(5);
     let (rules, updates) = input.split_once("\n\n").expect("malformed input");
 
-    let parsed_rules: HashMap<String, HashSet<String>> = rules
+    let parsed_rules: HashMap<&str, HashSet<&str>> = rules
         .lines()
         .map(|l| {
             l.split_once('|')
-                .unwrap_or_else(|| panic!("failed to parse rule {}", l))
+                .unwrap_or_else(|| panic!("failed to parse rule {l}"))
         })
         .fold(HashMap::new(), |mut map, (b, a)| {
-            map.entry(b.into()).or_default().insert(a.into());
+            map.entry(b).or_default().insert(a);
             map
         });
 
-    let result: i32 = updates
-        .lines()
-        .map(|l| l.split(',').map(str::to_string).collect())
-        .filter(|u| in_order(&parsed_rules, u))
-        .map(|u| {
-            u[u.len().div(2)]
-                .parse::<i32>()
-                .unwrap_or_else(|e| panic!("Failed to parse {} as i32", e))
-        })
-        .sum();
-
-    println!("Part 1: {:?}", result);
-
-    // --------------------  PART 2 --------------------
-
-    let result: i32 = updates
-        .lines()
-        .map(|l| l.split(',').map(str::to_string).collect())
-        .filter(|u| !in_order(&parsed_rules, u))
-        .map(|u| put_in_order(&parsed_rules, u))
-        .map(|u| {
-            u[u.len().div(2)]
-                .parse::<i32>()
-                .unwrap_or_else(|e| panic!("Failed to parse {} as i32", e))
-        })
-        .sum();
-
-    println!("Part 2: {:?}", result);
+    run_part(1, updates, &parsed_rules, part1);
+    run_part(2, updates, &parsed_rules, part2);
 }
 
-fn put_in_order(rules: &HashMap<String, HashSet<String>>, update: Vec<String>) -> Vec<String> {
-    let mut result = update.clone();
-    for i in 0..result.len() {
-        let earlier = rules
-            .get(&update[i])
-            .iter()
-            .flat_map(|h| h.iter())
-            .map(|r| result.iter().position(|u| u == r))
-            .flatten()
-            .min()
-            .filter(|e| *e < i);
-
-        if let Some(e) = earlier {
-            result.remove(i);
-            result.insert(e, update[i].clone());
-        }
-    }
-    result
+fn run_part<'a>(day: i32, updates: &'a str, parsed_rules: &HashMap<&str, HashSet<&str>>, part: fn(&'a str, &HashMap<&str, HashSet<&str>>) -> Vec<Vec<&'a str>>) {
+    let filtered = part(updates, parsed_rules);
+    let result = sum_mid(&filtered);
+    println!("Part {day}: {result}");
 }
 
-fn in_order(rules: &HashMap<String, HashSet<String>>, update: &Vec<String>) -> bool {
+fn part1<'a>(updates: &'a str, parsed_rules: &HashMap<&str, HashSet<&str>>) -> Vec<Vec<&'a str>> {
+    parse_updates(updates)
+        .filter(|u| in_order(parsed_rules, u))
+        .collect()
+}
+
+fn parse_updates(updates: &str) -> Map<Lines, fn(&str) -> Vec<&str>> {
+    updates.lines().map(|l| l.split(',').collect())
+}
+
+fn in_order(rules: &HashMap<&str, HashSet<&str>>, update: &[&str]) -> bool {
     for i in 1..update.len() {
         for j in 0..i {
             if let Some(matched_rules) = rules.get(&update[i]) {
@@ -80,4 +52,50 @@ fn in_order(rules: &HashMap<String, HashSet<String>>, update: &Vec<String>) -> b
         }
     }
     true
+}
+
+fn part2<'a>(updates: &'a str, parsed_rules: &HashMap<&str, HashSet<&str>>) -> Vec<Vec<&'a str>> {
+    parse_updates(updates)
+        .filter(|u| !in_order(parsed_rules, u))
+        .map(|u| put_in_order(parsed_rules, &u))
+        .collect()
+}
+
+fn put_in_order<'a>(rules: &HashMap<&str, HashSet<&str>>, update: &Vec<&'a str>) -> Vec<&'a str> {
+    (0..update.len()).fold(update.clone(), |mut acc, i| {
+        let earlier = target_position(rules, update, &acc, i);
+
+        if let Some(e) = earlier {
+            acc.remove(i);
+            acc.insert(e, update[i]);
+        }
+
+        acc
+    })
+}
+
+fn target_position(
+    rules: &HashMap<&str, HashSet<&str>>,
+    update: &[&str],
+    acc: &[&str],
+    i: usize,
+) -> Option<usize> {
+    rules
+        .get(update[i])
+        .iter()
+        .flat_map(|h| h.iter())
+        .filter_map(|r| acc.iter().position(|u| u == r))
+        .min()
+        .filter(|e| *e < i)
+}
+
+fn sum_mid(filtered_updates: &Vec<Vec<&str>>) -> i32 {
+    filtered_updates
+        .iter()
+        .map(|u| {
+            u[u.len().div(2)]
+                .parse::<i32>()
+                .unwrap_or_else(|e| panic!("Failed to parse {e} as i32"))
+        })
+        .sum()
 }

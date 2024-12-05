@@ -25,7 +25,7 @@ fn main() {
     run_part(2, part2(updates, &parsed_rules));
 }
 
-fn run_part<'a>(day: i32, filtered: Vec<Vec<&str>>) {
+fn run_part(day: i32, filtered: Vec<Vec<&str>>) {
     let result: i32 = filtered
         .iter()
         .map(|u| {

@@ -21,13 +21,19 @@ fn main() {
             map
         });
 
-    run_part(1, updates, &parsed_rules, part1);
-    run_part(2, updates, &parsed_rules, part2);
+    run_part(1, part1(updates, &parsed_rules));
+    run_part(2, part2(updates, &parsed_rules));
 }
 
-fn run_part<'a>(day: i32, updates: &'a str, parsed_rules: &HashMap<&str, HashSet<&str>>, part: fn(&'a str, &HashMap<&str, HashSet<&str>>) -> Vec<Vec<&'a str>>) {
-    let filtered = part(updates, parsed_rules);
-    let result = sum_mid(&filtered);
+fn run_part<'a>(day: i32, filtered: Vec<Vec<&str>>) {
+    let result: i32 = filtered
+        .iter()
+        .map(|u| {
+            u[u.len().div(2)]
+                .parse::<i32>()
+                .unwrap_or_else(|e| panic!("Failed to parse {e} as i32"))
+        })
+        .sum();
     println!("Part {day}: {result}");
 }
 
@@ -87,15 +93,4 @@ fn target_position(
         .filter_map(|r| acc.iter().position(|u| u == r))
         .min()
         .filter(|e| *e < i)
-}
-
-fn sum_mid(filtered_updates: &Vec<Vec<&str>>) -> i32 {
-    filtered_updates
-        .iter()
-        .map(|u| {
-            u[u.len().div(2)]
-                .parse::<i32>()
-                .unwrap_or_else(|e| panic!("Failed to parse {e} as i32"))
-        })
-        .sum()
 }

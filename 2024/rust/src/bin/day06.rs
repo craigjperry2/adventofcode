@@ -66,31 +66,27 @@ fn next_location(grid: &Grid, loc: &Guard) -> Guard {
 
 // -------------------- PART 2 --------------------
 
-fn part2(grid: &Grid) -> Vec<Point> {
+fn part2(grid: &Grid) -> Vec<Grid> {
     let start = find_start(grid);
 
     candidate_grids(grid)
-        .iter()
-        .map(|(g, p)| (g, p))
-        .filter(|(g, _)| has_loop(g, &start))
-        .map(|(_, p)| *p)
+        .into_iter()
+        .filter(|g| has_loop(g, &start))
         .collect()
 }
 
-fn candidate_grids(grid: &Grid) -> Vec<(Grid, Point)> {
+fn candidate_grids(grid: &Grid) -> Vec<Grid> {
     (0..grid.cells.len())
         .filter(|i| grid.cells[*i] == Cell::Empty)
         .map(|i| {
             let mut g = grid.cells.clone();
+            
             g[i] = Cell::Obstacle;
-            (
-                Grid {
-                    cells: g,
-                    width: grid.width,
-                    height: grid.height,
-                },
-                Point::from_offset(grid.width, i),
-            )
+            Grid {
+                cells: g,
+                width: grid.width,
+                height: grid.height,
+            }
         })
         .collect()
 }
@@ -171,6 +167,7 @@ impl Grid {
 
 impl FromStr for Grid {
     type Err = Infallible; // Cell parsing will just panic
+    
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let mut cells = Vec::new();
         let mut width: isize = 0;
@@ -222,6 +219,7 @@ enum Direction {
 impl Direction {
     fn turn_right(&self) -> Self {
         use Direction::*;
+        
         match self {
             North => East,
             East => South,
@@ -242,7 +240,7 @@ struct Point {
 impl Point {
     fn step(&self, d: &Direction) -> Self {
         use Direction::*;
-        
+
         match d {
             North => Self {
                 x: self.x,
@@ -265,7 +263,7 @@ impl Point {
 
     fn from_offset(width: isize, offset: usize) -> Self {
         let ioffset = isize::try_from(offset).unwrap();
-        
+
         Self {
             x: ioffset % width,
             y: ioffset / width,

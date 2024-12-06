@@ -129,10 +129,11 @@ fn has_loop(grid: &Grid, start: &Guard) -> bool {
 // -------------------- TYPES: CELL --------------------
 
 #[derive(Clone, PartialEq, Eq)]
+#[repr(u8)]
 enum Cell {
-    Empty,
-    Obstacle,
-    StartPosition,
+    Empty = b'.',
+    Obstacle = b'#',
+    StartPosition = b'^',
 }
 
 impl Display for Cell {
@@ -140,9 +141,9 @@ impl Display for Cell {
         use Cell::*;
 
         match self {
-            Empty => write!(f, "."),
-            Obstacle => write!(f, "#"),
-            StartPosition => write!(f, "^"),
+            Empty => write!(f, "{}", Empty as u8 as char),
+            Obstacle => write!(f, "{}", Obstacle as u8 as char),
+            StartPosition => write!(f, "{}", StartPosition as u8 as char),
         }
     }
 }
@@ -150,11 +151,15 @@ impl Display for Cell {
 impl From<char> for Cell {
     fn from(c: char) -> Self {
         use Cell::*;
+        
+        const EMPTY: char = Empty as u8 as char;
+        const OBSTACLE: char = Obstacle as u8 as char;
+        const START_POSITION: char = StartPosition as u8 as char;
 
         match c {
-            '.' => Empty,
-            '#' => Obstacle,
-            '^' => StartPosition,
+            EMPTY => Empty,
+            OBSTACLE => Obstacle,
+            START_POSITION => StartPosition,
             _ => panic!("Invalid cell: {c}"),
         }
     }

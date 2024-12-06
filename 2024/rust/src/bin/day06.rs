@@ -76,11 +76,16 @@ fn part2(grid: &Grid) -> Vec<Grid> {
 }
 
 fn candidate_grids(grid: &Grid) -> Vec<Grid> {
+    let part1_journey: HashSet<usize> = part1(grid)
+        .iter()
+        .map(|p| p.to_offset(grid.width))
+        .collect();
+
     (0..grid.cells.len())
-        .filter(|i| grid.cells[*i] == Cell::Empty)
+        .filter(|i| part1_journey.contains(i))
         .map(|i| {
             let mut g = grid.cells.clone();
-            
+
             g[i] = Cell::Obstacle;
             Grid {
                 cells: g,
@@ -167,7 +172,7 @@ impl Grid {
 
 impl FromStr for Grid {
     type Err = Infallible; // Cell parsing will just panic
-    
+
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let mut cells = Vec::new();
         let mut width: isize = 0;
@@ -219,7 +224,7 @@ enum Direction {
 impl Direction {
     fn turn_right(&self) -> Self {
         use Direction::*;
-        
+
         match self {
             North => East,
             East => South,

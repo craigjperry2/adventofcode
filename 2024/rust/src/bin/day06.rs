@@ -5,13 +5,23 @@ use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::str::FromStr;
 
 fn main() {
+    let sw_parsing = std::time::Instant::now();
     let grid: Grid = read_day_input(6).parse().expect("Failed to parse grid");
+    println!("Parsing took: {}µs", sw_parsing.elapsed().as_micros());
 
+    let sw_part1 = std::time::Instant::now();
     let distinct_positions = part1(&grid).len();
-    println!("Part 1:\n{distinct_positions}");
+    println!(
+        "Part 1: '{distinct_positions}' took {}ms",
+        sw_part1.elapsed().as_millis()
+    );
 
-    let distinct_positions = part2(&grid).len();
-    println!("Part 2:\n{distinct_positions}");
+    let sw_part2 = std::time::Instant::now();
+    let positions = part2(&grid).len();
+    println!(
+        "Part 2: '{positions}' took {}ms",
+        sw_part2.elapsed().as_millis()
+    );
 }
 
 // -------------------- PART 1 --------------------

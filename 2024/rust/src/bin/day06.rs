@@ -6,32 +6,133 @@ use std::str::FromStr;
 
 fn main() {
     let grid: Grid = read_day_input(6).parse().expect("Failed to parse grid");
+
     let distinct_positions = part1(&grid).len();
     println!("Part 1:\n{distinct_positions}");
+
+    let distinct_positions = part2(&grid).len();
+    println!("Part 2:\n{distinct_positions}");
 }
 
-#[derive(PartialEq, Eq)]
+// -------------------- PART 1 --------------------
+
+fn part1(grid: &Grid) -> HashSet<Point> {
+    let mut positions = HashSet::new();
+    let start = find_start(grid);
+    recursive_step_through_grid(grid, &start, &mut positions);
+    positions
+}
+
+fn find_start(grid: &Grid) -> Guard {
+    let offset: usize = grid
+        .cells
+        .iter()
+        .position(|c| *c == Cell::StartPosition)
+        .expect("Did not find a starting position");
+
+    Guard {
+        p: Point::from_offset(grid.width, offset),
+        d: Direction::North,
+    }
+}
+
+fn recursive_step_through_grid(grid: &Grid, loc: &Guard, visited: &mut HashSet<Point>) {
+    if grid.is_out_of_bounds(&loc.p) {
+        return;
+    }
+
+    visited.insert(loc.p);
+
+    let next_loc = next_location(grid, loc);
+    recursive_step_through_grid(grid, &next_loc, visited);
+}
+
+fn next_location(grid: &Grid, loc: &Guard) -> Guard {
+    let next_p = loc.p.step(&loc.d);
+    if !grid.is_out_of_bounds(&next_p) && grid.is_obstacle(&next_p) {
+        // Obstacle ahead, turn right 90 but don't move forward
+        Guard {
+            p: loc.p,
+            d: loc.d.turn_right(),
+        }
+    } else {
+        // Move one forward in same direction
+        Guard {
+            p: next_p,
+            d: loc.d.clone(),
+        }
+    }
+}
+
+// -------------------- PART 2 --------------------
+
+fn part2(grid: &Grid) -> Vec<Point> {
+    let start = find_start(grid);
+
+    candidate_grids(grid)
+        .iter()
+        .map(|(g, p)| (g, p))
+        .filter(|(g, _)| has_loop(g, &start))
+        .map(|(_, p)| *p)
+        .collect()
+}
+
+fn candidate_grids(grid: &Grid) -> Vec<(Grid, Point)> {
+    (0..grid.cells.len())
+        .filter(|i| grid.cells[*i] == Cell::Empty)
+        .map(|i| {
+            let mut g = grid.cells.clone();
+            g[i] = Cell::Obstacle;
+            (
+                Grid {
+                    cells: g,
+                    width: grid.width,
+                    height: grid.height,
+                },
+                Point::from_offset(grid.width, i),
+            )
+        })
+        .collect()
+}
+
+fn has_loop(grid: &Grid, start: &Guard) -> bool {
+    let mut seen = HashSet::new();
+    let mut loc = start.clone();
+
+    loop {
+        if grid.is_out_of_bounds(&loc.p) {
+            return false;
+        }
+
+        let next_loc = next_location(grid, &loc);
+        if next_loc.d != loc.d && seen.contains(&loc) {
+            return true;
+        }
+        if next_loc.d != loc.d {
+            seen.insert(loc.clone());
+        }
+
+        loc = next_loc;
+    }
+}
+
+// -------------------- TYPES: CELL --------------------
+
+#[derive(Clone, PartialEq, Eq)]
 enum Cell {
     Empty,
     Obstacle,
-    PositionFacingNorth,
-    PositionFacingEast,
-    PositionFacingSouth,
-    PositionFacingWest,
+    StartPosition,
 }
 
-// TODO: not really sure how to consolidate the ., #, ^, >, v, < literals into the enum definition.
-//       you can assign an int to each variant so maybe store  ascii value? Yuk...
 impl Display for Cell {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         use Cell::*;
+
         match self {
             Empty => write!(f, "."),
             Obstacle => write!(f, "#"),
-            PositionFacingNorth => write!(f, "^"),
-            PositionFacingEast => write!(f, ">"),
-            PositionFacingSouth => write!(f, "v"),
-            PositionFacingWest => write!(f, "<"),
+            StartPosition => write!(f, "^"),
         }
     }
 }
@@ -39,18 +140,19 @@ impl Display for Cell {
 impl From<char> for Cell {
     fn from(c: char) -> Self {
         use Cell::*;
+
         match c {
             '.' => Empty,
             '#' => Obstacle,
-            '^' => PositionFacingNorth,
-            '>' => PositionFacingEast,
-            'v' => PositionFacingSouth,
-            '<' => PositionFacingWest,
+            '^' => StartPosition,
             _ => panic!("Invalid cell: {c}"),
         }
     }
 }
 
+// -------------------- TYPES: GRID --------------------
+
+#[derive(Clone)]
 struct Grid {
     cells: Vec<Cell>,
     width: isize,
@@ -67,7 +169,6 @@ impl Grid {
     }
 }
 
-// FromStr because Grid has a text representation we want to parse()
 impl FromStr for Grid {
     type Err = Infallible; // Cell parsing will just panic
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -108,6 +209,9 @@ impl Display for Grid {
     }
 }
 
+// -------------------- TYPES: DIRECTION --------------------
+
+#[derive(Clone, PartialEq, Eq, Hash)]
 enum Direction {
     North,
     East,
@@ -127,7 +231,9 @@ impl Direction {
     }
 }
 
-#[derive(PartialEq, Eq, Hash, Copy, Clone)]
+// -------------------- TYPES: POINT --------------------
+
+#[derive(PartialEq, Eq, Hash, Copy, Clone, Debug)]
 struct Point {
     x: isize,
     y: isize,
@@ -136,6 +242,7 @@ struct Point {
 impl Point {
     fn step(&self, d: &Direction) -> Self {
         use Direction::*;
+        
         match d {
             North => Self {
                 x: self.x,
@@ -158,6 +265,7 @@ impl Point {
 
     fn from_offset(width: isize, offset: usize) -> Self {
         let ioffset = isize::try_from(offset).unwrap();
+        
         Self {
             x: ioffset % width,
             y: ioffset / width,
@@ -169,52 +277,10 @@ impl Point {
     }
 }
 
+// -------------------- TYPES: GUARD --------------------
+
+#[derive(PartialEq, Eq, Clone, Hash)]
 struct Guard {
     p: Point,
     d: Direction,
-}
-
-fn part1(grid: &Grid) -> HashSet<Point> {
-    let mut positions = HashSet::new();
-    let start = find_start(grid);
-    recursive_step_through_grid(grid, start, &mut positions);
-    positions
-}
-
-fn recursive_step_through_grid(grid: &Grid, loc: Guard, visited: &mut HashSet<Point>) {
-    if grid.is_out_of_bounds(&loc.p) {
-        return;
-    }
-
-    visited.insert(loc.p);
-
-    let next_p = loc.p.step(&loc.d);
-    let next_loc = if !grid.is_out_of_bounds(&next_p) && grid.is_obstacle(&next_p) {
-        // Obstacle ahead, turn right 90 but don't move forward
-        Guard {
-            p: loc.p,
-            d: loc.d.turn_right(),
-        }
-    } else {
-        // Move one forward in same direction
-        Guard {
-            p: next_p,
-            d: loc.d,
-        }
-    };
-
-    recursive_step_through_grid(grid, next_loc, visited);
-}
-
-fn find_start(grid: &Grid) -> Guard {
-    // TODO: there's a simpler way to capture North in the type system here, i'm sure...
-    let offset: usize = grid
-        .cells
-        .iter()
-        .position(|c| *c == Cell::PositionFacingNorth)
-        .expect("Did not find a starting position");
-    Guard {
-        p: Point::from_offset(grid.width, offset),
-        d: Direction::North,
-    }
 }

@@ -152,11 +152,11 @@ impl From<char> for Cell {
     fn from(c: char) -> Self {
         use Cell::*;
         
-        const EMPTY: char = Empty as u8 as char;
-        const OBSTACLE: char = Obstacle as u8 as char;
-        const START_POSITION: char = StartPosition as u8 as char;
+        const EMPTY: u8 = Empty as u8;
+        const OBSTACLE: u8 = Obstacle as u8;
+        const START_POSITION: u8 = StartPosition as u8;
 
-        match c {
+        match c as u8 {
             EMPTY => Empty,
             OBSTACLE => Obstacle,
             START_POSITION => StartPosition,

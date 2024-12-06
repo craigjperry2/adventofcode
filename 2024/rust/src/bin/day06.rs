@@ -92,6 +92,7 @@ fn candidate_grids(grid: &Grid) -> Vec<Grid> {
         .collect();
 
     (0..grid.cells.len())
+        // .filter(|i| grid.cells[*i] == Cell::Empty)
         .filter(|i| part1_journey.contains(i))
         .map(|i| {
             let mut g = grid.cells.clone();

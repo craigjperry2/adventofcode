@@ -27,34 +27,32 @@ fn main() {
 // -------------------- PART 1 --------------------
 
 fn part1(grid: &Grid) -> HashSet<Point> {
-    let mut positions = HashSet::new();
     let start = find_start(grid);
-    recursive_step_through_grid(grid, &start, &mut positions);
-    positions
+    recursive_step_through_grid(grid, &start, HashSet::new())
 }
 
 fn find_start(grid: &Grid) -> Guard {
-    let offset: usize = grid
+    let index: usize = grid
         .cells
         .iter()
         .position(|c| *c == Cell::StartPosition)
         .expect("Did not find a starting position");
 
     Guard {
-        p: Point::from_offset(grid.width, offset),
+        p: Point::from_index(grid.width, index),
         d: Direction::North,
     }
 }
 
-fn recursive_step_through_grid(grid: &Grid, loc: &Guard, visited: &mut HashSet<Point>) {
+fn recursive_step_through_grid(grid: &Grid, loc: &Guard, mut visited: HashSet<Point>) -> HashSet<Point> {
     if grid.is_out_of_bounds(&loc.p) {
-        return;
+        return visited;
     }
 
     visited.insert(loc.p);
 
     let next_loc = next_location(grid, loc);
-    recursive_step_through_grid(grid, &next_loc, visited);
+    recursive_step_through_grid(grid, &next_loc, visited)
 }
 
 fn next_location(grid: &Grid, loc: &Guard) -> Guard {
@@ -88,7 +86,7 @@ fn part2(grid: &Grid) -> Vec<Grid> {
 fn candidate_grids(grid: &Grid) -> Vec<Grid> {
     let part1_journey: HashSet<usize> = part1(grid)
         .iter()
-        .map(|p| p.to_offset(grid.width))
+        .map(|p| p.to_index(grid.width))
         .collect();
 
     (0..grid.cells.len())
@@ -177,7 +175,7 @@ impl Grid {
     }
 
     fn is_obstacle(&self, p: &Point) -> bool {
-        self.cells[p.to_offset(self.width)] == Cell::Obstacle
+        self.cells[p.to_index(self.width)] == Cell::Obstacle
     }
 }
 
@@ -277,16 +275,16 @@ impl Point {
         }
     }
 
-    fn from_offset(width: isize, offset: usize) -> Self {
-        let ioffset = isize::try_from(offset).unwrap();
+    fn from_index(width: isize, uindex: usize) -> Self {
+        let iindex = isize::try_from(uindex).unwrap();
 
         Self {
-            x: ioffset % width,
-            y: ioffset / width,
+            x: iindex % width,
+            y: iindex / width,
         }
     }
 
-    fn to_offset(&self, width: isize) -> usize {
+    fn to_index(&self, width: isize) -> usize {
         usize::try_from(self.y * width + self.x).unwrap()
     }
 }

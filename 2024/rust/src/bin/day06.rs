@@ -12,8 +12,8 @@ fn main() {
     let sw_part1 = std::time::Instant::now();
     let distinct_positions = part1(&grid).len();
     println!(
-        "Part 1: '{distinct_positions}' took {}ms",
-        sw_part1.elapsed().as_millis()
+        "Part 1: '{distinct_positions}' took {}µs",
+        sw_part1.elapsed().as_micros()
     );
 
     let sw_part2 = std::time::Instant::now();

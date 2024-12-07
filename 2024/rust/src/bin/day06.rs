@@ -56,19 +56,13 @@ fn recursive_step_through_grid(grid: &Grid, loc: &Guard, mut visited: HashSet<Po
 }
 
 fn next_location(grid: &Grid, loc: &Guard) -> Guard {
-    let next_p = loc.p.step(&loc.d);
-    if !grid.is_out_of_bounds(&next_p) && grid.is_obstacle(&next_p) {
+    let next_loc = loc.step();
+    if !grid.is_out_of_bounds(&next_loc.p) && grid.is_obstacle(&next_loc.p) {
         // Obstacle ahead, turn right 90 but don't move forward
-        Guard {
-            p: loc.p,
-            d: loc.d.turn_right(),
-        }
+        loc.turn_right()
     } else {
         // Move one forward in same direction
-        Guard {
-            p: next_p,
-            d: loc.d.clone(),
-        }
+        next_loc
     }
 }
 
@@ -151,7 +145,7 @@ impl Display for Cell {
 impl From<char> for Cell {
     fn from(c: char) -> Self {
         use Cell::*;
-        
+
         const EMPTY: u8 = Empty as u8;
         const OBSTACLE: u8 = Obstacle as u8;
         const START_POSITION: u8 = StartPosition as u8;
@@ -225,6 +219,39 @@ impl Display for Grid {
     }
 }
 
+// -------------------- TYPES: GUARD --------------------
+
+#[derive(PartialEq, Eq, Clone, Hash)]
+struct Guard {
+    d: Direction,
+    p: Point,
+}
+
+impl Guard {
+    fn step(&self) -> Self {
+        use Direction::*;
+
+        let p = match self.d {
+            North => self.p.north(),
+            East => self.p.east(),
+            South => self.p.south(),
+            West => self.p.west(),
+        };
+
+        Self {
+            d: self.d.clone(),
+            p,
+        }
+    }
+    
+    fn turn_right(&self) -> Self {
+        Self {
+            d: self.d.turn_right(),
+            p: self.p,
+        }
+    }
+}
+
 // -------------------- TYPES: DIRECTION --------------------
 
 #[derive(Clone, PartialEq, Eq, Hash)]
@@ -257,26 +284,28 @@ struct Point {
 }
 
 impl Point {
-    fn step(&self, d: &Direction) -> Self {
-        use Direction::*;
-
-        match d {
-            North => Self {
-                x: self.x,
-                y: self.y - 1,
-            },
-            East => Self {
-                x: self.x + 1,
-                y: self.y,
-            },
-            South => Self {
-                x: self.x,
-                y: self.y + 1,
-            },
-            West => Self {
-                x: self.x - 1,
-                y: self.y,
-            },
+    fn north(&self) -> Self {
+        Self {
+            x: self.x,
+            y: self.y - 1,
+        }
+    }
+    fn east(&self) -> Self {
+        Self {
+            x: self.x + 1,
+            y: self.y,
+        }
+    }
+    fn south(&self) -> Self {
+        Self {
+            x: self.x,
+            y: self.y + 1,
+        }
+    }
+    fn west(&self) -> Self {
+        Self {
+            x: self.x - 1,
+            y: self.y,
         }
     }
 
@@ -292,12 +321,4 @@ impl Point {
     fn to_index(&self, width: isize) -> usize {
         usize::try_from(self.y * width + self.x).unwrap()
     }
-}
-
-// -------------------- TYPES: GUARD --------------------
-
-#[derive(PartialEq, Eq, Clone, Hash)]
-struct Guard {
-    p: Point,
-    d: Direction,
 }

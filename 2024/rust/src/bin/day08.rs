@@ -1,7 +1,8 @@
 use aoc24::read_day_input;
 use itertools::Itertools;
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::convert::Infallible;
+use std::ops::Sub;
 use std::str::FromStr;
 
 fn main() {
@@ -12,8 +13,15 @@ fn main() {
     let sw_part1 = std::time::Instant::now();
     let unique_locations = part1(&grid);
     println!(
-        "Part 1: '{unique_locations}' took {}ms",
-        sw_part1.elapsed().as_millis()
+        "Part 1: '{unique_locations}' took {}µs",
+        sw_part1.elapsed().as_micros()
+    );
+
+    let sw_part2 = std::time::Instant::now();
+    let unique_locations = part2(&grid);
+    println!(
+        "Part 2: '{unique_locations}' took {}µs",
+        sw_part2.elapsed().as_micros()
     );
 }
 
@@ -43,6 +51,31 @@ fn find_antinodes(grid: &Grid, node: Node) -> Vec<AntiNode> {
                 Some(candidate)
             }
         })
+        .collect()
+}
+
+// -------------------- PART 2 --------------------
+
+fn part2(grid: &Grid) -> usize {
+    let antinodes: Vec<AntiNode> = grid
+        .nodes
+        .iter()
+        .flat_map(|a| find_harmonic_antinodes(&grid, a.clone()))
+        .collect();
+
+    display(grid, &antinodes);
+
+    // unique locations
+    let unique_locations: HashSet<Point> = antinodes.iter().map(|a| a.loc).unique().collect();
+
+    unique_locations.len()
+}
+
+fn find_harmonic_antinodes(grid: &Grid, node: Node) -> Vec<AntiNode> {
+    grid.nodes
+        .iter()
+        .filter(|&n| n.freq == node.freq && n.loc != node.loc)
+        .flat_map(|n| node.harmonic_antinodes(&n, &grid))
         .collect()
 }
 
@@ -117,6 +150,17 @@ impl Point {
     }
 }
 
+impl Sub for Point {
+    type Output = Self;
+
+    fn sub(self, other: Self) -> Self {
+        Self {
+            x: self.x - other.x,
+            y: self.y - other.y,
+        }
+    }
+}
+
 // -------------------- TYPES: NODE --------------------
 
 #[derive(Clone, Eq, PartialEq, Hash, Debug)]
@@ -136,10 +180,45 @@ impl Node {
             },
         }
     }
+
+    fn harmonic_antinodes(&self, other: &Node, grid: &Grid) -> Vec<AntiNode> {
+        let diff = self.loc.difference(&other.loc);
+        let mut antinodes = Vec::new();
+        let mut candidate = other.loc;
+        while !grid.is_out_of_bounds(&candidate) {
+            antinodes.push(AntiNode {
+                node: self.clone(),
+                loc: candidate,
+            });
+            candidate = candidate - diff;
+        }
+        antinodes
+    }
 }
 
 #[derive(Eq, PartialEq, Hash, Debug)]
 struct AntiNode {
     node: Node,
     loc: Point,
+}
+
+// -------------------- UTILS --------------------
+
+fn display(grid: &Grid, antinodes: &Vec<AntiNode>) {
+    let xy_antinodes: HashMap<Point, &AntiNode> = antinodes.iter().map(|a| (a.loc, a)).collect();
+    let xy_nodes: HashMap<Point, &Node> = grid.nodes.iter().map(|n| (n.loc, n)).collect();
+    for y in 0..grid.height {
+        for x in 0..grid.width {
+            let p = Point { x, y };
+            let c = match xy_antinodes.get(&p) {
+                Some(_) => '#',
+                None => match xy_nodes.get(&p) {
+                    Some(n) => n.freq,
+                    None => '.',
+                },
+            };
+            print!("{c}");
+        }
+        println!();
+    }
 }

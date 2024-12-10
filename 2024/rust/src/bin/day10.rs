@@ -14,7 +14,7 @@ fn main() {
         "Part 1: '{trailheads_sum}' took {}µs",
         sw_part1.elapsed().as_micros()
     );
-    
+
     let sw_part2 = std::time::Instant::now();
     let trailheads_sum = part2(&grid);
     println!(
@@ -87,7 +87,7 @@ fn find_all_trailheads<'a>(
     }
 }
 
-// -------------------- PART 1 --------------------
+// -------------------- PART 2 --------------------
 
 fn part2(grid: &Grid) -> usize {
     find_all_trail_starts(grid)
@@ -98,7 +98,7 @@ fn part2(grid: &Grid) -> usize {
             find_all_trailheads(grid, start, &Vec::new(), &mut trails);
             trails
         })
-        .flat_map(|trail| trail.iter().map(|path| path[8]).collect::<Vec<Point>>()) // unique trailheads
+        .flat_map(|trail| trail.iter().map(|path| path[8]).collect::<Vec<Point>>())
         // .inspect(|&p| println!("  Found trailhead at: {p:?}"))
         .collect::<Vec<Point>>()
         .len()

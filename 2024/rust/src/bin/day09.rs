@@ -1,4 +1,5 @@
 use aoc24::read_day_input;
+use itertools::Itertools;
 use std::iter::repeat;
 
 fn main() {
@@ -72,9 +73,8 @@ fn part2(file_map: &[usize]) -> usize {
         while space_start < file_start {
             let next_space = find_next_space(&expanded_file_map, space_start, file_start);
 
-            if next_space.is_some() {
-                space_start = next_space.unwrap().0;
-                let space_len = next_space.unwrap().1;
+            if let Some((space_start_pos, space_len)) = next_space {
+                space_start = space_start_pos;
                 if space_len >= file_len {
                     for i in 0..file_len {
                         expanded_file_map.swap(space_start + i, file_start + i);
@@ -84,11 +84,10 @@ fn part2(file_map: &[usize]) -> usize {
             } else {
                 break;
             }
-            
+
             space_start += 1; // should really jump by space_len
         }
     }
-    // println!("{:?}", expanded_file_map);
 
     expanded_file_map
         .iter()
@@ -113,7 +112,7 @@ fn find_next_space(
     while end < file_map.len() && file_map[end].is_none() {
         end += 1;
     }
-    if end > ending+1 {
+    if end > ending + 1 {
         return None;
     }
     Some((start, end - start))
@@ -150,6 +149,42 @@ fn find_files(file_map: &[Option<usize>]) -> Vec<(FileStart, FileLen)> {
     }
 
     files
+}
+
+#[derive(Debug)]
+enum FileState {
+    Start(usize, usize), // position, id
+    End(usize, usize),   // position, id
+}
+
+// Much slower, was just curious how this might turn out
+fn find_files2(file_map: &[Option<usize>]) -> Vec<(FileStart, FileLen)> {
+    (vec![None].iter().chain(file_map))
+        .collect::<Vec<&Option<usize>>>()
+        .iter()
+        .zip(
+            file_map
+                .iter()
+                .chain(&vec![None])
+                .collect::<Vec<&Option<usize>>>(),
+        )
+        .enumerate()
+        .flat_map(|(pos, (&&id, &next_id))| match (id, next_id) {
+            (None, Some(n)) => vec![FileState::Start(pos, n)],
+            (Some(i), Some(n)) if i != n => vec![FileState::End(pos, i), FileState::Start(pos, n)],
+            (Some(i), None) => vec![FileState::End(pos, i)],
+            (None, None) | (Some(_), Some(_)) => vec![],
+        })
+        .rev()
+        .tuples()
+        .filter_map(|(end, start)| {
+            if let (FileState::Start(s, _), FileState::End(e, _)) = (start, end) {
+                Some((s, e - s))
+            } else {
+                None
+            }
+        })
+        .collect()
 }
 
 #[cfg(test)]

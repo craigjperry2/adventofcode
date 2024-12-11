@@ -1,6 +1,5 @@
 use aoc24::read_day_input;
 use std::collections::HashMap;
-use std::ops::Div;
 
 fn main() {
     let sw_parsing = std::time::Instant::now();
@@ -80,7 +79,7 @@ fn part1(start_stones: &Vec<String>) -> usize {
 //     result
 // }
 
-// REJECTED: i see a relationship to fibonacci when i plot the 7 known test cases in excel, can't seem to nail it for more than 5 of 7
+// REJECTED: i thought i saw a relationship to fibonacci when i plot the 7 known test cases in excel, 5 lined up, but i'm wrong here...
 // fn part2_fib() -> usize {
 //     // after a bunch of pattern matching in excel i see some kind of fibonacci relationship but...
 //     let mut answer: usize = 0;
@@ -123,36 +122,26 @@ fn part2(start_stones: &Vec<String>) -> usize {
         .collect(); // NB: assumes starting list is unique
 
     for _ in 0..75 {
-        buckets = blink(buckets);
+        buckets = buckets
+            .iter()
+            .flat_map(|(&stone, &count)| {
+                if stone == 0 {
+                    vec![(1, count)]
+                } else if stone.to_string().len() % 2 == 0 {
+                    let half = stone.to_string().len() / 2;
+                    vec![
+                        (stone.to_string()[..half].parse().unwrap(), count),
+                        (stone.to_string()[half..].parse().unwrap(), count),
+                    ]
+                } else {
+                    vec![(stone * 2024, count)]
+                }
+            })
+            .fold(HashMap::new(), |mut acc, (stone, count)| {
+                *acc.entry(stone).or_insert(0) += count;
+                acc
+            });
     }
 
-    buckets.iter().map(|(_, v)| v).sum()
-}
-
-fn blink(buckets: HashMap<usize, usize>) -> HashMap<usize, usize> {
-    let mut stones: HashMap<usize, usize> = HashMap::new();
-    for (stone, count) in buckets {
-        if stone == 0 {
-            stones
-                .entry(1)
-                .and_modify(|counter| *counter += count)
-                .or_insert(count);
-        } else if stone.to_string().len() % 2 == 0 {
-            let half = stone.to_string().len().div(2);
-            stones
-                .entry(stone.to_string()[..half].parse().unwrap())
-                .and_modify(|counter| *counter += count)
-                .or_insert(count);
-            stones
-                .entry(stone.to_string()[half..].parse().unwrap())
-                .and_modify(|counter| *counter += count)
-                .or_insert(count);
-        } else {
-            stones
-                .entry(stone * 2024)
-                .and_modify(|counter| *counter += count)
-                .or_insert(count);
-        }
-    }
-    stones
+    buckets.values().sum()
 }

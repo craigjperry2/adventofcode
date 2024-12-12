@@ -1,5 +1,5 @@
 use aoc24::read_day_input;
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::convert::Infallible;
 use std::str::FromStr;
 
@@ -14,13 +14,19 @@ fn main() {
         "Part 1: '{price}' took {}ms",
         sw_part1.elapsed().as_millis()
     );
+
+    let sw_part2 = std::time::Instant::now();
+    let price = part2(&grid);
+    println!(
+        "Part 2: '{price}' took {}ms",
+        sw_part2.elapsed().as_millis()
+    );
 }
 
 // -------------------- PART 1 --------------------
 
 fn part1(grid: &Grid) -> usize {
-    let regions = find_regions(grid);
-    regions
+    find_regions(grid)
         .iter()
         .map(|r| r.price(&grid))
         // .inspect(|p| println!("{p}"))
@@ -65,6 +71,22 @@ fn find_neighbours(
             find_neighbours(&grid, other_plant.clone(), neighbours, seen);
         }
     }
+}
+
+// -------------------- PART 2 --------------------
+
+fn part2(grid: &Grid) -> usize {
+    let regions = find_regions(grid);
+
+    let point_to_region: HashMap<Point, Region> = regions
+        .iter()
+        .flat_map(|r| r.plants.iter().map(|p| p.loc).map(|p| (p, r.clone())))
+        .collect();
+
+    regions
+        .iter()
+        .map(|r| r.price2(grid, &point_to_region))
+        .sum()
 }
 
 // -------------------- TYPES: GRID --------------------
@@ -145,6 +167,94 @@ impl Point {
         }
         neighbours
     }
+
+    fn top_left(&self, grid: &Grid) -> Option<Self> {
+        let p = Point {
+            x: self.x - 1,
+            y: self.y - 1,
+        };
+        if grid.is_out_of_bounds(&p) {
+            return None;
+        }
+        Some(p)
+    }
+
+    fn top_right(&self, grid: &Grid) -> Option<Self> {
+        let p = Point {
+            x: self.x + 1,
+            y: self.y - 1,
+        };
+        if grid.is_out_of_bounds(&p) {
+            return None;
+        }
+        Some(p)
+    }
+
+    fn bottom_left(&self, grid: &Grid) -> Option<Self> {
+        let p = Point {
+            x: self.x - 1,
+            y: self.y + 1,
+        };
+        if grid.is_out_of_bounds(&p) {
+            return None;
+        }
+        Some(p)
+    }
+
+    fn bottom_right(&self, grid: &Grid) -> Option<Self> {
+        let p = Point {
+            x: self.x + 1,
+            y: self.y + 1,
+        };
+        if grid.is_out_of_bounds(&p) {
+            return None;
+        }
+        Some(p)
+    }
+
+    fn up(&self, grid: &Grid) -> Option<Self> {
+        let p = Point {
+            x: self.x,
+            y: self.y - 1,
+        };
+        if grid.is_out_of_bounds(&p) {
+            return None;
+        }
+        Some(p)
+    }
+
+    fn down(&self, grid: &Grid) -> Option<Self> {
+        let p = Point {
+            x: self.x,
+            y: self.y + 1,
+        };
+        if grid.is_out_of_bounds(&p) {
+            return None;
+        }
+        Some(p)
+    }
+
+    fn left(&self, grid: &Grid) -> Option<Self> {
+        let p = Point {
+            x: self.x - 1,
+            y: self.y,
+        };
+        if grid.is_out_of_bounds(&p) {
+            return None;
+        }
+        Some(p)
+    }
+
+    fn right(&self, grid: &Grid) -> Option<Self> {
+        let p = Point {
+            x: self.x + 1,
+            y: self.y,
+        };
+        if grid.is_out_of_bounds(&p) {
+            return None;
+        }
+        Some(p)
+    }
 }
 
 // -------------------- TYPES: PLANT --------------------
@@ -181,6 +291,116 @@ impl Plant {
         }
         boundaries
     }
+
+    fn boundary_corners(&self, grid: &Grid, p2r: &HashMap<Point, Region>) -> usize {
+        self.inside_corners(grid, p2r) + self.outside_corners(grid, p2r)
+    }
+
+    fn inside_corners(&self, grid: &Grid, p2r: &HashMap<Point, Region>) -> usize {
+        let patterns = [
+            (
+                [self.loc.left(&grid), self.loc.up(&grid)],
+                [self.loc.top_left(&grid)],
+            ),
+            // Top right = right+up same species, top-right diff species
+            (
+                [self.loc.right(&grid), self.loc.up(&grid)],
+                [self.loc.top_right(&grid)],
+            ),
+            // Bottom left = left+down same species, bottom-left diff species
+            (
+                [self.loc.left(&grid), self.loc.down(&grid)],
+                [self.loc.bottom_left(&grid)],
+            ),
+            // Bottom right = right+down same species, bottom-right diff species
+            (
+                [self.loc.right(&grid), self.loc.down(&grid)],
+                [self.loc.bottom_right(&grid)],
+            ),
+        ];
+
+        patterns
+            .iter()
+            .filter(|(same, diff)| {
+                same.iter()
+                    .all(|p| p.is_some() && p2r.get(&p.unwrap()) == p2r.get(&self.loc))
+                    && diff
+                        .iter()
+                        .all(|p| p.is_some() && p2r.get(&p.unwrap()) != p2r.get(&self.loc))
+            })
+            .count()
+    }
+
+    fn outside_corners(&self, grid: &Grid, p2r: &HashMap<Point, Region>) -> usize {
+        let patterns = [
+            (
+                vec![],
+                vec![
+                    self.loc.left(&grid),
+                    self.loc.up(&grid),
+                    self.loc.top_left(&grid),
+                ],
+            ),
+            // Top right = right+up+top-right diff species
+            (
+                vec![],
+                vec![
+                    self.loc.right(&grid),
+                    self.loc.up(&grid),
+                    self.loc.top_right(&grid),
+                ],
+            ),
+            // Bottom left = left+down+bottom-left diff species
+            (
+                vec![],
+                vec![
+                    self.loc.left(&grid),
+                    self.loc.down(&grid),
+                    self.loc.bottom_left(&grid),
+                ],
+            ),
+            // Bottom right = right+down+bottom-right diff species
+            (
+                vec![],
+                vec![
+                    self.loc.right(&grid),
+                    self.loc.down(&grid),
+                    self.loc.bottom_right(&grid),
+                ],
+            ),
+            // Special cases... nasty! :'(
+            (
+                vec![self.loc.top_left(&grid)],
+                vec![self.loc.left(&grid), self.loc.up(&grid)],
+            ),
+            // Top right = right+up+top-right diff species
+            (
+                vec![self.loc.top_right(&grid)],
+                vec![self.loc.right(&grid), self.loc.up(&grid)],
+            ),
+            // Bottom left = left+down+bottom-left diff species
+            (
+                vec![self.loc.bottom_left(&grid)],
+                vec![self.loc.left(&grid), self.loc.down(&grid)],
+            ),
+            // Bottom right = right+down+bottom-right diff species
+            (
+                vec![self.loc.bottom_right(&grid)],
+                vec![self.loc.right(&grid), self.loc.down(&grid)],
+            ),
+        ];
+
+        patterns
+            .iter()
+            .filter(|(same, diff)| {
+                same.iter()
+                    .all(|p| p.is_some() && p2r.get(&p.unwrap()) == p2r.get(&self.loc))
+                    && diff.iter().all(|p| {
+                        p.is_none() || (p.is_some() && p2r.get(&p.unwrap()) != p2r.get(&self.loc))
+                    })
+            })
+            .count()
+    }
 }
 
 // -------------------- TYPES: REGION --------------------
@@ -201,6 +421,17 @@ impl Region {
     }
 
     fn price(&self, grid: &Grid) -> usize {
-        self.area() * self.perimeter(&grid)
+        self.area() * self.perimeter(grid)
+    }
+
+    fn price2(&self, grid: &Grid, point_to_region: &HashMap<Point, Region>) -> usize {
+        self.area() * self.sides(grid, point_to_region)
+    }
+
+    fn sides(&self, grid: &Grid, point_to_region: &HashMap<Point, Region>) -> usize {
+        self.plants
+            .iter()
+            .map(|p| p.boundary_corners(grid, point_to_region))
+            .sum()
     }
 }

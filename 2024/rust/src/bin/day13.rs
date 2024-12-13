@@ -1,6 +1,5 @@
 use aoc24::read_day_input;
 use regex::Regex;
-use std::cmp::max;
 use std::str::FromStr;
 
 fn main() {
@@ -17,7 +16,7 @@ fn main() {
 
     let sw_part1 = std::time::Instant::now();
     let valid = part1(&equations);
-    println!("Part 1: '{valid}' took {}s", sw_part1.elapsed().as_secs());
+    println!("Part 1: '{valid}' took {}µs", sw_part1.elapsed().as_micros(),);
 
     let sw_part2 = std::time::Instant::now();
     let valid = part2(&equations);
@@ -34,7 +33,7 @@ fn part1(equations: &[Equation]) -> i32 {
         .iter()
         .map(|e| {
             let mut solutions: Vec<(i32, i32)> = vec![];
-            let limit = max(e.x_target, e.y_target);
+            let limit = 100;
             for a in 0..limit {
                 for b in 0..limit {
                     if a * e.a_x_coeff + b * e.b_x_coeff == e.x_target

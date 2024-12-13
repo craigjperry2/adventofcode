@@ -55,12 +55,12 @@ fn part2(equations: &[Equation]) -> i64 {
     equations
         .iter()
         .map(|e| Equation2 {
-            a_x_coeff: e.a_x_coeff as f64,
-            a_y_coeff: e.a_y_coeff as f64,
-            b_x_coeff: e.b_x_coeff as f64,
-            b_y_coeff: e.b_y_coeff as f64,
-            x_target: e.x_target as f64 + 10000000000000.0,
-            y_target: e.y_target as f64 + 10000000000000.0,
+            a_x_coeff: f64::from(e.a_x_coeff),
+            a_y_coeff: f64::from(e.a_y_coeff),
+            b_x_coeff: f64::from(e.b_x_coeff),
+            b_y_coeff: f64::from(e.b_y_coeff),
+            x_target: f64::from(e.x_target) + 10_000_000_000_000.0,
+            y_target: f64::from(e.y_target) + 10_000_000_000_000.0,
         })
         .filter_map(|e| {
             // Interpreting the input as a pair of equations:

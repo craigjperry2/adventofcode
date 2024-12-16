@@ -127,7 +127,6 @@ fn part2(grid: &Grid, instructions: &[Direction]) -> isize {
             let mut count = 1;
             let mut has_space = false;
 
-            // TODO: need to update for both left and right halfs, vertically
             while !grid.is_out_of_bounds(&probe) && !grid.is_obstacle(&probe) {
                 if grid.is_space(&probe) {
                     has_space = true;

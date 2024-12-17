@@ -4,6 +4,7 @@ use std::{env, fs};
 /// 
 /// Given "1" will try to return a String with the contents of ../data/day01.txt
 pub fn read_day_input(day: u32) -> String {
+    // TODO: Maybe replace this with include_str!() ?
     fs::read_to_string(filepath(day)).expect("Should have been able to read input file")
 }
 

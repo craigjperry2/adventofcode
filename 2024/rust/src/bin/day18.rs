@@ -9,19 +9,34 @@ use std::str::FromStr;
 fn main() {
     let sw_parsing = std::time::Instant::now();
     let input = read_day_input(18);
-    let mut grid: Grid = input.parse().expect("Failed to parse grid");
+    let grid: Grid = input.parse().expect("Failed to parse grid");
     println!("Parsing took: {}µs", sw_parsing.elapsed().as_micros());
 
     let sw_part1 = std::time::Instant::now();
-    let steps = part1(&mut grid);
+    let steps = part1(&grid, &input.lines().take(1024).join("\n"));
     println!(
         "Part 1: '{steps}' took {}µs",
         sw_part1.elapsed().as_micros()
     );
+
+    let sw_part2 = std::time::Instant::now();
+    let p = part2(&grid, &input);
+    println!("Part 2: '{p:?}' took {}µs", sw_part2.elapsed().as_micros());
 }
+
 // -------------------- PART 1 --------------------
 
-fn part1(grid: &mut Grid) -> isize {
+fn part1(grid: &Grid, s: &String) -> isize {
+    let mut grid = grid.clone();
+
+    s.lines()
+        .map(|l| {
+            l.split_once(',')
+                .unwrap_or_else(|| panic!("Failed to split {l}"))
+        })
+        .map(|(x, y)| (x.parse::<isize>().unwrap(), y.parse::<isize>().unwrap()))
+        .for_each(|(x, y)| grid.grid[(y * grid.height + x) as usize] = Cell::Obstacle);
+
     let mut path: Vec<Point> = Vec::new();
     let mut path_score: isize = 0;
     let mut open_set = BinaryHeap::new();
@@ -70,13 +85,23 @@ fn part1(grid: &mut Grid) -> isize {
         }
     }
 
-    path.iter().for_each(|p| {
-        grid.grid[p.to_offset(grid.width)] = Cell::Path
-    });
-
-    println!("{}", grid);
+    path.iter()
+        .for_each(|p| grid.grid[p.to_offset(grid.width)] = Cell::Path);
 
     path_score
+}
+
+// -------------------- PART 2 --------------------
+
+fn part2(grid: &Grid, s: &String) -> usize {
+    let mut result = 0;
+    for i in 0..3450 {
+        if part1(grid, &s.lines().take(1023 + i).join("\n")) == 0 {
+            result = 1023 + i;
+            break
+        }
+    }
+    result
 }
 
 // -------------------- TYPES: GRID --------------------
@@ -113,15 +138,6 @@ impl FromStr for Grid {
             y: height - 1,
         };
         let mut grid: Vec<Cell> = vec![Cell::Empty; (width * height) as usize];
-
-        s.lines()
-            .take(1024)
-            .map(|l| {
-                l.split_once(',')
-                    .unwrap_or_else(|| panic!("Failed to split {l}"))
-            })
-            .map(|(x, y)| (x.parse::<isize>().unwrap(), y.parse::<isize>().unwrap()))
-            .for_each(|(x, y)| grid[(y * height + x) as usize] = Cell::Obstacle);
 
         Ok(Self {
             grid,

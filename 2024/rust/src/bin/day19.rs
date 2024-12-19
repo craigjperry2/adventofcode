@@ -28,7 +28,7 @@ fn main() {
 fn part1(towels: &str, patterns: &str) -> usize {
     let needle: String = [
         "^(".to_string(),
-        towels.to_string().split(", ").join("|"),
+        towels.replace(", ", "|"),
         ")+$".to_string(),
     ]
     .concat();

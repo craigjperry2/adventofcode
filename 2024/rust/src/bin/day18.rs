@@ -95,7 +95,7 @@ fn part1(grid: &Grid, s: &String) -> isize {
 
 fn part2(grid: &Grid, s: &String) -> usize {
     let mut result = 0;
-    for i in 0..3450 {
+    for i in (0..3450).rev() {
         if part1(grid, &s.lines().take(1023 + i).join("\n")) == 0 {
             result = 1023 + i;
             break

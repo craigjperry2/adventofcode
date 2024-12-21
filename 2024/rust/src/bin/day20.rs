@@ -1,10 +1,10 @@
 use aoc24::read_day_input;
+use rayon::prelude::*;
 use std::cmp::Reverse;
 use std::collections::{BinaryHeap, HashMap};
 use std::convert::Infallible;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::str::FromStr;
-use rayon::prelude::*;
 
 fn main() {
     let sw_parsing = std::time::Instant::now();
@@ -15,6 +15,10 @@ fn main() {
     let sw_part1 = std::time::Instant::now();
     let cheats = part1(&grid);
     println!("Part 1: '{cheats}' took {}s", sw_part1.elapsed().as_secs());
+
+    let sw_part2 = std::time::Instant::now();
+    let cheats = part2(&grid);
+    println!("Part 2: '{cheats}' took {}s", sw_part2.elapsed().as_secs());
 }
 
 // -------------------- PART 1 --------------------
@@ -28,6 +32,28 @@ fn part1(grid: &Grid) -> usize {
         .filter(|&picoseconds| (path.len() as isize - picoseconds as isize) > 99)
         .count()
 }
+
+// -------------------- PART 2 --------------------
+
+fn part2(grid: &Grid) -> usize {
+    let mut total = 0;
+    let path = astar_race(grid);
+    // println!("{path:?}");
+    for start in 0..path.len() - 1 {
+        for end in start + 1..path.len() {
+            let distance = path[start].distance_heuristic(path[end]);
+            let difference = (end - start) as isize - distance;
+            if distance <= 20 && difference > 99 {
+                // println!("s:{start} e:{end} dist:{distance} diff:{difference}");
+                total += 1;
+            }
+        }
+    }
+    total
+}
+
+// 945714 too low
+// 1078443 too high
 
 fn find_blocks_separating_parallel_paths(grid: &Grid, path: &Vec<Point>) -> Vec<Point> {
     let mut separating_blocks = Vec::new();

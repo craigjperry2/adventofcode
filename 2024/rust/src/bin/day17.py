@@ -20,7 +20,7 @@ operations = {
     2: lambda op: combo(op) % 8,
     3: lambda op: ip if A == 0 else op - 2,
     4: lambda _: B ^ C,
-    5: lambda op: output.append(str(combo(op) % 8)),
+    5: lambda op: str(combo(op) % 8),
     6: lambda op: A // (2 ** combo(op)),
     7: lambda op: A // (2 ** combo(op)),
 }
@@ -35,10 +35,12 @@ while ip < len(program):
             A = result
         case 1 | 2 | 4 | 6:
             B = result
-        case 7:
-            C = result
         case 3:
             ip = result
+        case 5:
+            output.append(result)
+        case 7:
+            C = result
 
     ip += 2
 

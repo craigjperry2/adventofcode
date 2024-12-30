@@ -14,34 +14,32 @@ output = []
 
 combo = lambda r: {4: A, 5: B, 6: C}.get(r, r)
 
+operations = {
+    0: lambda op: A // (2 ** combo(op)),
+    1: lambda op: B ^ combo(op),
+    2: lambda op: combo(op) % 8,
+    3: lambda op: ip if A == 0 else op - 2,
+    4: lambda _: B ^ C,
+    5: lambda op: output.append(str(combo(op) % 8)),
+    6: lambda op: A // (2 ** combo(op)),
+    7: lambda op: A // (2 ** combo(op)),
+}
+
 while ip < len(program):
     instruction, operand = program[ip], program[ip + 1]
+    
+    result = operations[instruction](operand)
 
-    if instruction == 0:
-        A //= 2 ** combo(operand)
-
-    elif instruction == 1:
-        B ^= combo(operand)
-
-    elif instruction == 2:
-        B = combo(operand) % 8
-
-    elif instruction == 3:
-        if A != 0:
-            ip = operand - 2
-
-    elif instruction == 4:
-        B ^= C
-
-    elif instruction == 5:
-        output.append(str(combo(operand) % 8))
-
-    elif instruction == 6:
-        B = A // 2 ** combo(operand)
-
-    elif instruction == 7:
-        C = A // 2 ** combo(operand)
+    match instruction:
+        case 0:
+            A = result
+        case 1 | 2 | 4 | 6:
+            B = result
+        case 7:
+            C = result
+        case 3:
+            ip = result
 
     ip += 2
 
-print( ",".join(output))
+print(",".join(output))

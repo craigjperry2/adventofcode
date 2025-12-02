@@ -1,0 +1,13 @@
+[project]
+name = "2025"
+version = "0.1.0"
+description = "Advent of Code 2025 solutions in Mojo"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "mojo>=0.26.1.0.dev2025120205",
+]
+
+[[tool.uv.index]]
+url = "https://dl.modular.com/public/nightly/python/simple/"
+default = true

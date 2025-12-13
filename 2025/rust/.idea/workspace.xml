@@ -79,8 +79,8 @@
     </recent_temporary>
   </component>
   <component name="RustProjectSettings">
-    <option name="explicitPathToStdlib" value="/nix/store/qq4wr9vi6f9h1lcfjp18migi0y3wafdf-rust-default-1.92.0/lib/rustlib/src/rust/library" />
-    <option name="toolchainHomeDirectory" value="/nix/store/qq4wr9vi6f9h1lcfjp18migi0y3wafdf-rust-default-1.92.0/bin" />
+    <option name="explicitPathToStdlib" value="/nix/store/cvd5bmnxqrppb18n4v1dcwrzifky2n7l-rust-default-1.92.0/lib/rustlib/src/rust/library" />
+    <option name="toolchainHomeDirectory" value="/nix/store/cvd5bmnxqrppb18n4v1dcwrzifky2n7l-rust-default-1.92.0/bin" />
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">

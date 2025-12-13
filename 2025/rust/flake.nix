@@ -8,10 +8,8 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     rust-overlay.url = "github:oxalica/rust-overlay";
-    flake-utils = {
-      url = "github:numtide/flake-utils";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    flake-utils.url = "github:numtide/flake-utils";
+    flake-utils.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = { self, nixpkgs, rust-overlay, flake-utils, ... }:
@@ -23,8 +21,8 @@
           overlays = [ (import rust-overlay) ];
         };
 
-        rustToolchain = pkgs.rust-bin.stable."1.92.0".default.override {
-          extensions = [ "rust-src" "clippy" "rustfmt" ];
+        rustToolchain = pkgs.rust-bin.stable.latest.default.override {
+          extensions = [ "rust-src" "rust-docs" "clippy" "rustfmt" ];
         };
       in {
         devShell = pkgs.mkShell {

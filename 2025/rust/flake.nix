@@ -75,6 +75,15 @@
 
           shellHook = ''
             ${configureIdeaWorkspace}
+
+            echo
+            echo "Rust Development Environment Loaded"
+            echo
+            echo "The following are available:"
+            echo
+            echo "  * Use the 'rr' shortcut to launch rust rover in this directory"
+            echo "  * Rust toolchain version ${rustToolchain}"
+            echo
           '';
         };
       }

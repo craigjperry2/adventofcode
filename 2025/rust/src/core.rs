@@ -1,0 +1,127 @@
+use color_eyre::eyre::{bail, eyre, Result};
+use once_cell::sync::Lazy;
+use std::fs;
+use std::path::{Path, PathBuf};
+
+/// Trait implemented by each day's solution module.
+pub trait Solution: Sync + Send {
+    fn part1(&self, _input: &str) -> Result<String> {
+        bail!("Part 1 not implemented for this day")
+    }
+    fn part2(&self, _input: &str) -> Result<String> {
+        bail!("Part 2 not implemented for this day")
+    }
+}
+
+/// Return a solution instance for the given day, if registered.
+///
+/// Add your day modules and map entries here, e.g.:
+///   mod day01; static DAY01: day01::Solver = day01::Solver; map.insert(1, &DAY01);
+pub fn solution_for(_day: u8) -> Option<&'static dyn Solution> {
+    // No days registered yet; add matches here as you implement them.
+    None
+}
+
+pub fn year() -> u16 { 2025 }
+
+static INPUTS_DIR: Lazy<PathBuf> = Lazy::new(|| PathBuf::from("inputs"));
+
+pub fn ensure_inputs_dir() -> Result<()> {
+    fs::create_dir_all(&*INPUTS_DIR)?;
+    Ok(())
+}
+
+pub fn input_path(day: u8) -> PathBuf {
+    let fname = format!("day{day:02}.txt");
+    INPUTS_DIR.join(fname)
+}
+
+pub fn read_or_fetch_input(day: u8) -> Result<String> {
+    let path = input_path(day);
+    if path.exists() {
+        Ok(fs::read_to_string(path)?)
+    } else {
+        #[cfg(feature = "online")]
+        {
+            ensure_inputs_dir()?;
+            let contents = fetch_input(day)?;
+            fs::write(&path, &contents)?;
+            Ok(contents)
+        }
+        #[cfg(not(feature = "online"))]
+        {
+            bail!(
+                "Input file not found at {}. Run `aoc25 fetch {day}` or build with `--features online` to auto-fetch.",
+                path.display()
+            )
+        }
+    }
+}
+
+#[cfg(feature = "online")]
+fn session_cookie() -> Result<String> {
+    let sess = std::env::var("AOC_SESSION").map_err(|_| eyre!(
+        "AOC_SESSION env var not set. Copy your 'session' cookie from https://adventofcode.com in your browser and set it, e.g.\n  export AOC_SESSION=...\nConsider using direnv to manage it locally."
+    ))?;
+    Ok(format!("session={sess}"))
+}
+
+#[cfg(feature = "online")]
+fn client() -> Result<reqwest::blocking::Client> {
+    let client = reqwest::blocking::Client::builder()
+        .user_agent("aoc25-rust (https://github.com/craigjperry2)")
+        .build()?;
+    Ok(client)
+}
+
+#[cfg(feature = "online")]
+pub fn fetch_input(day: u8) -> Result<String> {
+    let url = format!("https://adventofcode.com/{}/day/{}/input", year(), day);
+    let resp = client()?.get(url)
+        .header(reqwest::header::COOKIE, session_cookie()?)
+        .send()?;
+    if !resp.status().is_success() {
+        bail!("Failed to fetch input: HTTP {}", resp.status());
+    }
+    Ok(resp.text()?)
+}
+
+#[cfg(not(feature = "online"))]
+pub fn fetch_input(_day: u8) -> Result<String> {
+    bail!("Online fetch is disabled. Rebuild with --features online")
+}
+
+#[cfg(feature = "online")]
+pub fn submit(day: u8, part: u8, answer: &str) -> Result<String> {
+    if part != 1 && part != 2 { bail!("part must be 1 or 2"); }
+    let url = format!("https://adventofcode.com/{}/day/{}/answer", year(), day);
+    let resp = client()?.post(url)
+        .header(reqwest::header::COOKIE, session_cookie()?)
+        .form(&[("level", part.to_string()), ("answer", answer.to_string())])
+        .send()?;
+    if !resp.status().is_success() {
+        bail!("Failed to submit: HTTP {}", resp.status());
+    }
+    Ok(resp.text()?)
+}
+
+#[cfg(not(feature = "online"))]
+pub fn submit(_day: u8, _part: u8, _answer: &str) -> Result<String> {
+    bail!("Online submission is disabled. Rebuild with --features online")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn path_for_day_formats() {
+        assert_eq!(input_path(1), Path::new("inputs/day01.txt"));
+        assert_eq!(input_path(12), Path::new("inputs/day12.txt"));
+    }
+
+    #[test]
+    fn no_solution_by_default() {
+        assert!(solution_for(1).is_none());
+    }
+}

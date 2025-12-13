@@ -1,5 +1,9 @@
 {
-  description = "Rust Rover environment";
+  description = "Rust Rover Dev Env";
+  # I use this with a simple .envrc file containing only:
+  #   use flake
+  #   PATH_add bin
+  #
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
@@ -36,15 +40,7 @@
           ];
 
           shellHook = ''
-            # Generate .envrc if it doesn't exist
-            if [ ! -f .envrc ]; then
-              cat > .envrc << 'ENVRC'
-            use flake
-            PATH_add bin
-            ENVRC
-            fi
-
-            # Generate bin/rr launcher script
+            # Generate a bin/rr launcher script which i add to the $PATH via .envrc
             mkdir -p bin
             cat > bin/rr << 'SCRIPT'
             #!/bin/sh

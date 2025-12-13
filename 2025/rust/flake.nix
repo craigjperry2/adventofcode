@@ -2,7 +2,6 @@
   description = "Rust Rover Dev Env";
   # I use this with a simple .envrc file containing only:
   #   use flake
-  #   PATH_add bin
   #
 
   inputs = {
@@ -24,64 +23,58 @@
         rustToolchain = pkgs.rust-bin.stable.latest.default.override {
           extensions = [ "rust-src" "rust-docs" "clippy" "rustfmt" ];
         };
+
+        stdlibPath = "${rustToolchain}/lib/rustlib/src/rust/library";
+        toolchainBin = "${rustToolchain}/bin";
+
+        # Launcher script for Rust Rover
+        rr = pkgs.writeShellScriptBin "rr" ''
+          rustrover "$PWD" &
+        '';
+
+        # Script to configure .idea/workspace.xml with Nix toolchain paths
+        configureIdeaWorkspace = pkgs.writeShellScript "configure-idea-workspace" ''
+          IDEA_DIR="$PWD/.idea"
+          WORKSPACE_FILE="$IDEA_DIR/workspace.xml"
+
+          mkdir -p "$IDEA_DIR"
+
+          if [ ! -f "$WORKSPACE_FILE" ]; then
+            cat > "$WORKSPACE_FILE" << 'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <project version="4">
+            <component name="RustProjectSettings">
+              <option name="explicitPathToStdlib" value="${stdlibPath}" />
+              <option name="toolchainHomeDirectory" value="${toolchainBin}" />
+            </component>
+          </project>
+          EOF
+          elif ! grep -q "RustProjectSettings" "$WORKSPACE_FILE"; then
+            ${pkgs.gnused}/bin/sed -i \
+              's|</project>|  <component name="RustProjectSettings">\n    <option name="explicitPathToStdlib" value="${stdlibPath}" />\n    <option name="toolchainHomeDirectory" value="${toolchainBin}" />\n  </component>\n</project>|' \
+              "$WORKSPACE_FILE"
+          else
+            ${pkgs.gnused}/bin/sed -i \
+              -e 's|explicitPathToStdlib" value="[^"]*"|explicitPathToStdlib" value="${stdlibPath}"|' \
+              -e 's|toolchainHomeDirectory" value="[^"]*"|toolchainHomeDirectory" value="${toolchainBin}"|' \
+              "$WORKSPACE_FILE"
+          fi
+        '';
       in {
-        devShell = pkgs.mkShell {
-          nativeBuildInputs = with pkgs; [
-            rustToolchain
-          ];
+        devShells.default = pkgs.mkShell {
+          nativeBuildInputs = [ rustToolchain ];
 
           buildInputs = with pkgs; [
             openssl
             pkg-config
-
             jetbrains.rust-rover
+            rr
           ];
 
+          RUST_SRC_PATH = stdlibPath;
+
           shellHook = ''
-            # Generate a bin/rr launcher script which i add to the $PATH via .envrc
-            mkdir -p bin
-            cat > bin/rr << 'SCRIPT'
-            #!/bin/sh
-            rustrover "$PWD" &
-            SCRIPT
-            chmod +x bin/rr
-
-            # Update .idea/workspace.xml with correct Rust toolchain paths
-            IDEA_DIR="$PWD/.idea"
-            WORKSPACE_FILE="$IDEA_DIR/workspace.xml"
-            STDLIB_PATH="${rustToolchain}/lib/rustlib/src/rust/library"
-            TOOLCHAIN_BIN="${rustToolchain}/bin"
-
-            mkdir -p "$IDEA_DIR"
-
-            if [ -f "$WORKSPACE_FILE" ]; then
-              # File exists - update or add RustProjectSettings
-              if grep -q "RustProjectSettings" "$WORKSPACE_FILE"; then
-                # Update existing settings
-                ${pkgs.gnused}/bin/sed -i \
-                  -e "s|explicitPathToStdlib\" value=\"[^\"]*\"|explicitPathToStdlib\" value=\"$STDLIB_PATH\"|" \
-                  -e "s|toolchainHomeDirectory\" value=\"[^\"]*\"|toolchainHomeDirectory\" value=\"$TOOLCHAIN_BIN\"|" \
-                  "$WORKSPACE_FILE"
-              else
-                # Add RustProjectSettings before closing </project> tag
-                ${pkgs.gnused}/bin/sed -i \
-                  "s|</project>|  <component name=\"RustProjectSettings\">\n    <option name=\"explicitPathToStdlib\" value=\"$STDLIB_PATH\" />\n    <option name=\"toolchainHomeDirectory\" value=\"$TOOLCHAIN_BIN\" />\n  </component>\n</project>|" \
-                  "$WORKSPACE_FILE"
-              fi
-            else
-              # Create new workspace.xml with RustProjectSettings
-              cat > "$WORKSPACE_FILE" << EOF
-            <?xml version="1.0" encoding="UTF-8"?>
-            <project version="4">
-              <component name="RustProjectSettings">
-                <option name="explicitPathToStdlib" value="$STDLIB_PATH" />
-                <option name="toolchainHomeDirectory" value="$TOOLCHAIN_BIN" />
-              </component>
-            </project>
-            EOF
-            fi
-            
-            export RUST_SRC_PATH=$STDLIB_PATH
+            ${configureIdeaWorkspace}
           '';
         };
       }

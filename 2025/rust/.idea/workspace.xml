@@ -11,7 +11,7 @@
     </cargoProject>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="29c6962b-f6fe-4a5e-9097-0706a3782060" name="Changes" comment="prep day 3">
+    <list default="true" id="29c6962b-f6fe-4a5e-9097-0706a3782060" name="Changes" comment="day 3 part 1">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/day03.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/day03.rs" afterDir="false" />
     </list>
@@ -54,6 +54,7 @@
     "Cargo.day2p1.executor": "Run",
     "Cargo.day2p2.executor": "Run",
     "Cargo.day3p1.executor": "Run",
+    "Cargo.day3p2.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
@@ -80,7 +81,7 @@
       <recent name="$PROJECT_DIR$/src" />
     </key>
   </component>
-  <component name="RunManager" selected="Cargo.day3p1">
+  <component name="RunManager" selected="Cargo.day3p2">
     <configuration name="Test day03::tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
       <option name="buildProfileId" value="test" />
       <option name="command" value="test --package aoc25 --bin aoc25 day03::tests" />
@@ -99,9 +100,9 @@
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
-    <configuration name="day3p1" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+    <configuration name="day3p2" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
       <option name="buildProfileId" value="dev" />
-      <option name="command" value="run --package aoc25 --bin aoc25 -- run 3 p1" />
+      <option name="command" value="run --package aoc25 --bin aoc25 -- run 3 p2" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <envs />
       <option name="emulateTerminal" value="true" />
@@ -119,11 +120,11 @@
     </configuration>
     <list>
       <item itemvalue="Cargo.Test day03::tests" />
-      <item itemvalue="Cargo.day3p1" />
+      <item itemvalue="Cargo.day3p2" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Cargo.day3p1" />
+        <item itemvalue="Cargo.day3p2" />
         <item itemvalue="Cargo.Test day03::tests" />
       </list>
     </recent_temporary>
@@ -140,7 +141,7 @@
       <option name="presentableId" value="Default" />
       <updated>1765644419582</updated>
       <workItem from="1765644419584" duration="30000" />
-      <workItem from="1765646858204" duration="23266000" />
+      <workItem from="1765646858204" duration="23601000" />
     </task>
     <task id="LOCAL-00001" summary="Add AOC scaffold this year">
       <option name="closed" value="true" />
@@ -190,7 +191,15 @@
       <option name="project" value="LOCAL" />
       <updated>1765834001252</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="day 3 part 1">
+      <option name="closed" value="true" />
+      <created>1765835045860</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1765835045860</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -203,6 +212,7 @@
     <MESSAGE value="day 2 part 1" />
     <MESSAGE value="day 2 part 2" />
     <MESSAGE value="prep day 3" />
-    <option name="LAST_COMMIT_MESSAGE" value="prep day 3" />
+    <MESSAGE value="day 3 part 1" />
+    <option name="LAST_COMMIT_MESSAGE" value="day 3 part 1" />
   </component>
 </project>

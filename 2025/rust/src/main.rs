@@ -1,6 +1,7 @@
 mod cli;
 mod core;
 mod day01;
+mod day02;
 mod parsers;
 
 fn main() -> color_eyre::Result<()> {

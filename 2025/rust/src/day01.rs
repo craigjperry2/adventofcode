@@ -1,6 +1,6 @@
 use crate::core::Solution;
 use crate::parsers::{lines, parse_day, parse_day_with_preview};
-use color_eyre::eyre::{Result, bail};
+use color_eyre::eyre::{Result};
 
 pub struct Day01;
 

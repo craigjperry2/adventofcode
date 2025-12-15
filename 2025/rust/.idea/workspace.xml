@@ -11,13 +11,11 @@
     </cargoProject>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="29c6962b-f6fe-4a5e-9097-0706a3782060" name="Changes" comment="Add AOC scaffold this year">
-      <change afterPath="$PROJECT_DIR$/src/day01.rs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/parsers.rs" afterDir="false" />
+    <list default="true" id="29c6962b-f6fe-4a5e-9097-0706a3782060" name="Changes" comment="day 1 rust">
+      <change afterPath="$PROJECT_DIR$/src/day02.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/core.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/day01.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/day01.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -62,6 +60,7 @@
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
     "git-widget-placeholder": "main",
     "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "/Users/craig/Code/github.com/craigjperry2/adventofcode/2025/rust/src",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -74,6 +73,11 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src" />
+    </key>
+  </component>
   <component name="RunManager">
     <configuration name="Run aoc25" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
       <option name="buildProfileId" value="dev" />
@@ -111,7 +115,7 @@
       <option name="presentableId" value="Default" />
       <updated>1765644419582</updated>
       <workItem from="1765644419584" duration="30000" />
-      <workItem from="1765646858204" duration="16755000" />
+      <workItem from="1765646858204" duration="17430000" />
     </task>
     <task id="LOCAL-00001" summary="Add AOC scaffold this year">
       <option name="closed" value="true" />
@@ -121,7 +125,15 @@
       <option name="project" value="LOCAL" />
       <updated>1765649573629</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="day 1 rust">
+      <option name="closed" value="true" />
+      <created>1765827745819</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1765827745819</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -129,6 +141,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Add AOC scaffold this year" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add AOC scaffold this year" />
+    <MESSAGE value="day 1 rust" />
+    <option name="LAST_COMMIT_MESSAGE" value="day 1 rust" />
   </component>
 </project>

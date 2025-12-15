@@ -114,10 +114,10 @@ pub fn ints(text: &str) -> Vec<i64> {
 }
 
 /// All positive integers in `text`.
-pub fn positive_ints(text: &str) -> Vec<i64> {
+pub fn positive_ints(text: &str) -> Vec<u64> {
     RE_POSITIVE_INTS
         .find_iter(text)
-        .filter_map(|m| m.as_str().parse::<i64>().ok())
+        .filter_map(|m| m.as_str().parse::<u64>().ok())
         .collect()
 }
 
@@ -151,4 +151,3 @@ pub fn atom(text: &str) -> Atom {
 pub fn atoms(text: &str) -> Vec<Atom> {
     RE_ATOMS.find_iter(text).map(|m| atom(m.as_str())).collect()
 }
-

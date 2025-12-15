@@ -11,12 +11,12 @@
     </cargoProject>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="29c6962b-f6fe-4a5e-9097-0706a3782060" name="Changes" comment="day 1 rust">
-      <change afterPath="$PROJECT_DIR$/src/day02.rs" afterDir="false" />
+    <list default="true" id="29c6962b-f6fe-4a5e-9097-0706a3782060" name="Changes" comment="setup day 2">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/core.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/day01.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/day01.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/day02.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/day02.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/parsers.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/parsers.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -52,6 +52,8 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Cargo.Run aoc25.executor": "Run",
+    "Cargo.Test day02::tests.executor": "Run",
+    "Cargo.day2p1.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
@@ -78,10 +80,10 @@
       <recent name="$PROJECT_DIR$/src" />
     </key>
   </component>
-  <component name="RunManager">
-    <configuration name="Run aoc25" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
-      <option name="buildProfileId" value="dev" />
-      <option name="command" value="run --package aoc25 --bin aoc25 -- run 1 p2" />
+  <component name="RunManager" selected="Cargo.day2p1">
+    <configuration name="Test day02::tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="buildProfileId" value="test" />
+      <option name="command" value="test --package aoc25 --bin aoc25 day02::tests" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <envs />
       <option name="emulateTerminal" value="true" />
@@ -97,9 +99,32 @@
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
+    <configuration name="day2p1" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="buildProfileId" value="dev" />
+      <option name="command" value="run --package aoc25 --bin aoc25 -- run 2 p1" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <envs />
+      <option name="emulateTerminal" value="true" />
+      <option name="channel" value="DEFAULT" />
+      <option name="requiredFeatures" value="true" />
+      <option name="allFeatures" value="false" />
+      <option name="withSudo" value="false" />
+      <option name="buildTarget" value="REMOTE" />
+      <option name="backtrace" value="SHORT" />
+      <option name="isRedirectInput" value="false" />
+      <option name="redirectInputPath" value="" />
+      <method v="2">
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="Cargo.Test day02::tests" />
+      <item itemvalue="Cargo.day2p1" />
+    </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Cargo.Run aoc25" />
+        <item itemvalue="Cargo.day2p1" />
+        <item itemvalue="Cargo.Test day02::tests" />
       </list>
     </recent_temporary>
   </component>
@@ -115,7 +140,7 @@
       <option name="presentableId" value="Default" />
       <updated>1765644419582</updated>
       <workItem from="1765644419584" duration="30000" />
-      <workItem from="1765646858204" duration="17430000" />
+      <workItem from="1765646858204" duration="21040000" />
     </task>
     <task id="LOCAL-00001" summary="Add AOC scaffold this year">
       <option name="closed" value="true" />
@@ -133,7 +158,15 @@
       <option name="project" value="LOCAL" />
       <updated>1765827745819</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="setup day 2">
+      <option name="closed" value="true" />
+      <created>1765829316822</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1765829316822</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -142,6 +175,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Add AOC scaffold this year" />
     <MESSAGE value="day 1 rust" />
-    <option name="LAST_COMMIT_MESSAGE" value="day 1 rust" />
+    <MESSAGE value="setup day 2" />
+    <option name="LAST_COMMIT_MESSAGE" value="setup day 2" />
   </component>
 </project>

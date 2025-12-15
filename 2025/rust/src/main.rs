@@ -1,8 +1,9 @@
 mod cli;
 mod core;
+mod day01;
+mod parsers;
 
 fn main() -> color_eyre::Result<()> {
-    // Better errors and load env (.env, .envrc already handled by direnv)
     color_eyre::install()?;
     let _ = dotenvy::dotenv();
 

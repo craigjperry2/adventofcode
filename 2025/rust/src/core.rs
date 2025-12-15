@@ -3,7 +3,6 @@ use once_cell::sync::Lazy;
 use std::fs;
 use std::path::{Path, PathBuf};
 
-/// Trait implemented by each day's solution module.
 pub trait Solution: Sync + Send {
     fn part1(&self, _input: &str) -> Result<String> {
         bail!("Part 1 not implemented for this day")
@@ -13,13 +12,14 @@ pub trait Solution: Sync + Send {
     }
 }
 
-/// Return a solution instance for the given day, if registered.
-///
-/// Add your day modules and map entries here, e.g.:
-///   mod day01; static DAY01: day01::Solver = day01::Solver; map.insert(1, &DAY01);
-pub fn solution_for(_day: u8) -> Option<&'static dyn Solution> {
-    // No days registered yet; add matches here as you implement them.
-    None
+use crate::day01;
+static DAY01: day01::Day01 = day01::Day01;
+
+pub fn solution_for(day: u8) -> Option<&'static dyn Solution> {
+    match day {
+        1 => Some(&DAY01),
+        _ => None,
+    }
 }
 
 pub fn year() -> u16 { 2025 }
@@ -121,7 +121,7 @@ mod tests {
     }
 
     #[test]
-    fn no_solution_by_default() {
-        assert!(solution_for(1).is_none());
+    fn day1_is_registered() {
+        assert!(solution_for(1).is_some());
     }
 }

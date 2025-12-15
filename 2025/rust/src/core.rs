@@ -12,14 +12,16 @@ pub trait Solution: Sync + Send {
     }
 }
 
-use crate::{day01, day02};
+use crate::{day01, day02, day03};
 static DAY01: day01::Day01 = day01::Day01;
 static DAY02: day02::Day02 = day02::Day02;
+static DAY03: day03::Day03 = day03::Day03;
 
 pub fn solution_for(day: u8) -> Option<&'static dyn Solution> {
     match day {
         1 => Some(&DAY01),
         2 => Some(&DAY02),
+        3 => Some(&DAY03),
         _ => None,
     }
 }

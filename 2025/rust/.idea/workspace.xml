@@ -11,16 +11,13 @@
     </cargoProject>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="29c6962b-f6fe-4a5e-9097-0706a3782060" name="Changes" comment="day 2 part 1">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/day02.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/day02.rs" afterDir="false" />
-    </list>
+    <list default="true" id="29c6962b-f6fe-4a5e-9097-0706a3782060" name="Changes" comment="day 2 part 2" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="RsBuildProfile:dev" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="RsBuildProfile:test" />
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
@@ -78,7 +75,7 @@
       <recent name="$PROJECT_DIR$/src" />
     </key>
   </component>
-  <component name="RunManager" selected="Cargo.day2p2">
+  <component name="RunManager" selected="Cargo.Test day02::tests">
     <configuration name="Test day02::tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
       <option name="buildProfileId" value="test" />
       <option name="command" value="test --package aoc25 --bin aoc25 day02::tests" />
@@ -121,8 +118,8 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Cargo.day2p2" />
         <item itemvalue="Cargo.Test day02::tests" />
+        <item itemvalue="Cargo.day2p2" />
       </list>
     </recent_temporary>
   </component>
@@ -138,7 +135,7 @@
       <option name="presentableId" value="Default" />
       <updated>1765644419582</updated>
       <workItem from="1765644419584" duration="30000" />
-      <workItem from="1765646858204" duration="21702000" />
+      <workItem from="1765646858204" duration="22067000" />
     </task>
     <task id="LOCAL-00001" summary="Add AOC scaffold this year">
       <option name="closed" value="true" />
@@ -172,7 +169,15 @@
       <option name="project" value="LOCAL" />
       <updated>1765833081784</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="day 2 part 2">
+      <option name="closed" value="true" />
+      <created>1765833731564</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1765833731564</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -183,6 +188,7 @@
     <MESSAGE value="day 1 rust" />
     <MESSAGE value="setup day 2" />
     <MESSAGE value="day 2 part 1" />
-    <option name="LAST_COMMIT_MESSAGE" value="day 2 part 1" />
+    <MESSAGE value="day 2 part 2" />
+    <option name="LAST_COMMIT_MESSAGE" value="day 2 part 2" />
   </component>
 </project>

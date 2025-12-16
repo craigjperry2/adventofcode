@@ -1,4 +1,4 @@
-use crate::core::{read_or_fetch_input, Solution};
+use crate::core::Solution;
 use crate::parsers::{Grid, MissingChar, Point, DIRECTIONS8};
 use color_eyre::eyre::Result;
 
@@ -7,7 +7,7 @@ pub struct Day04;
 impl Solution for Day04 {
     fn part1(&self, input: &str) -> Result<String> {
         let paper_grid = Grid::from_str_with(
-            &read_or_fetch_input(4)?,
+            &input,
             &DIRECTIONS8,
             &Default::default(),
             MissingChar::Error,
@@ -17,12 +17,8 @@ impl Solution for Day04 {
     }
 
     fn part2(&self, input: &str) -> Result<String> {
-        let paper_grid = Grid::from_str_with(
-            &read_or_fetch_input(4)?,
-            &DIRECTIONS8,
-            &Default::default(),
-            MissingChar::Error,
-        );
+        let paper_grid =
+            Grid::from_str_with(input, &DIRECTIONS8, &Default::default(), MissingChar::Error);
         let rolls = removable_rolls(paper_grid);
         Ok(rolls.len().to_string())
     }

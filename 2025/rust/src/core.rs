@@ -1,4 +1,4 @@
-use color_eyre::eyre::{bail, eyre, Result};
+use color_eyre::eyre::{bail, Result};
 use once_cell::sync::Lazy;
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -12,11 +12,12 @@ pub trait Solution: Sync + Send {
     }
 }
 
-use crate::{day01, day02, day03, day04};
+use crate::{day01, day02, day03, day04, day05};
 static DAY01: day01::Day01 = day01::Day01;
 static DAY02: day02::Day02 = day02::Day02;
 static DAY03: day03::Day03 = day03::Day03;
 static DAY04: day04::Day04 = day04::Day04;
+static DAY05: day05::Day05 = day05::Day05;
 
 pub fn solution_for(day: u8) -> Option<&'static dyn Solution> {
     match day {
@@ -24,11 +25,14 @@ pub fn solution_for(day: u8) -> Option<&'static dyn Solution> {
         2 => Some(&DAY02),
         3 => Some(&DAY03),
         4 => Some(&DAY04),
+        5 => Some(&DAY05),
         _ => None,
     }
 }
 
-pub fn year() -> u16 { 2025 }
+pub fn year() -> u16 {
+    2025
+}
 
 static INPUTS_DIR: Lazy<PathBuf> = Lazy::new(|| PathBuf::from("inputs"));
 
@@ -83,7 +87,8 @@ fn client() -> Result<reqwest::blocking::Client> {
 #[cfg(feature = "online")]
 pub fn fetch_input(day: u8) -> Result<String> {
     let url = format!("https://adventofcode.com/{}/day/{}/input", year(), day);
-    let resp = client()?.get(url)
+    let resp = client()?
+        .get(url)
         .header(reqwest::header::COOKIE, session_cookie()?)
         .send()?;
     if !resp.status().is_success() {
@@ -99,9 +104,12 @@ pub fn fetch_input(_day: u8) -> Result<String> {
 
 #[cfg(feature = "online")]
 pub fn submit(day: u8, part: u8, answer: &str) -> Result<String> {
-    if part != 1 && part != 2 { bail!("part must be 1 or 2"); }
+    if part != 1 && part != 2 {
+        bail!("part must be 1 or 2");
+    }
     let url = format!("https://adventofcode.com/{}/day/{}/answer", year(), day);
-    let resp = client()?.post(url)
+    let resp = client()?
+        .post(url)
         .header(reqwest::header::COOKIE, session_cookie()?)
         .form(&[("level", part.to_string()), ("answer", answer.to_string())])
         .send()?;

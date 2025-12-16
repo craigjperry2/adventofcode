@@ -11,9 +11,12 @@
     </cargoProject>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="29c6962b-f6fe-4a5e-9097-0706a3782060" name="Changes" comment="day 3 part 1">
+    <list default="true" id="29c6962b-f6fe-4a5e-9097-0706a3782060" name="Changes" comment="day 3 part 2">
+      <change afterPath="$PROJECT_DIR$/src/day04.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/day03.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/day03.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/core.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/parsers.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/parsers.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,11 +31,17 @@
       </list>
     </option>
   </component>
+  <component name="FormatOnSaveOptions">
+    <option name="myRunOnSave" value="true" />
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
   </component>
   <component name="MacroExpansionManager">
     <option name="directoryName" value="IDhtbZf5" />
+  </component>
+  <component name="OptimizeOnSaveOptions">
+    <option name="myRunOnSave" value="true" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
@@ -54,7 +63,8 @@
     "Cargo.day2p1.executor": "Run",
     "Cargo.day2p2.executor": "Run",
     "Cargo.day3p1.executor": "Run",
-    "Cargo.day3p2.executor": "Run",
+    "Cargo.day3p2.executor": "Debug",
+    "Cargo.day4p1.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
@@ -71,7 +81,7 @@
     "nodejs_package_manager_path": "npm",
     "org.rust.cargo.project.model.PROJECT_DISCOVERY": "true",
     "org.rust.cargo.project.model.impl.CargoExternalSystemProjectAware.subscribe.first.balloon": "",
-    "settings.editor.selected.configurable": "configurable.group.junie",
+    "settings.editor.selected.configurable": "actions.on.save",
     "to.speed.mode.migration.done": "true",
     "vue.rearranger.settings.migration": "true"
   }
@@ -81,10 +91,10 @@
       <recent name="$PROJECT_DIR$/src" />
     </key>
   </component>
-  <component name="RunManager" selected="Cargo.day3p2">
-    <configuration name="Test day03::tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+  <component name="RunManager" selected="Cargo.day4p1">
+    <configuration name="Test day04::tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
       <option name="buildProfileId" value="test" />
-      <option name="command" value="test --package aoc25 --bin aoc25 day03::tests" />
+      <option name="command" value="test --package aoc25 --bin aoc25 day04::tests" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <envs />
       <option name="emulateTerminal" value="true" />
@@ -100,9 +110,9 @@
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
-    <configuration name="day3p2" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+    <configuration name="day4p1" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
       <option name="buildProfileId" value="dev" />
-      <option name="command" value="run --package aoc25 --bin aoc25 -- run 3 p2" />
+      <option name="command" value="run --package aoc25 --bin aoc25 -- run 4 p1" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <envs />
       <option name="emulateTerminal" value="true" />
@@ -119,13 +129,13 @@
       </method>
     </configuration>
     <list>
-      <item itemvalue="Cargo.Test day03::tests" />
-      <item itemvalue="Cargo.day3p2" />
+      <item itemvalue="Cargo.Test day04::tests" />
+      <item itemvalue="Cargo.day4p1" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Cargo.day3p2" />
-        <item itemvalue="Cargo.Test day03::tests" />
+        <item itemvalue="Cargo.day4p1" />
+        <item itemvalue="Cargo.Test day04::tests" />
       </list>
     </recent_temporary>
   </component>
@@ -141,7 +151,7 @@
       <option name="presentableId" value="Default" />
       <updated>1765644419582</updated>
       <workItem from="1765644419584" duration="30000" />
-      <workItem from="1765646858204" duration="23601000" />
+      <workItem from="1765646858204" duration="30247000" />
     </task>
     <task id="LOCAL-00001" summary="Add AOC scaffold this year">
       <option name="closed" value="true" />
@@ -199,7 +209,15 @@
       <option name="project" value="LOCAL" />
       <updated>1765835045860</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="day 3 part 2">
+      <option name="closed" value="true" />
+      <created>1765835406563</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1765835406563</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -213,6 +231,7 @@
     <MESSAGE value="day 2 part 2" />
     <MESSAGE value="prep day 3" />
     <MESSAGE value="day 3 part 1" />
-    <option name="LAST_COMMIT_MESSAGE" value="day 3 part 1" />
+    <MESSAGE value="day 3 part 2" />
+    <option name="LAST_COMMIT_MESSAGE" value="day 3 part 2" />
   </component>
 </project>

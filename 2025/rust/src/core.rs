@@ -1,4 +1,4 @@
-use color_eyre::eyre::{bail, Result};
+use color_eyre::eyre::{bail, eyre, Result};
 use once_cell::sync::Lazy;
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -12,12 +12,13 @@ pub trait Solution: Sync + Send {
     }
 }
 
-use crate::{day01, day02, day03, day04, day05};
+use crate::{day01, day02, day03, day04, day05, day06};
 static DAY01: day01::Day01 = day01::Day01;
 static DAY02: day02::Day02 = day02::Day02;
 static DAY03: day03::Day03 = day03::Day03;
 static DAY04: day04::Day04 = day04::Day04;
 static DAY05: day05::Day05 = day05::Day05;
+static DAY06: day06::Day06 = day06::Day06;
 
 pub fn solution_for(day: u8) -> Option<&'static dyn Solution> {
     match day {
@@ -26,6 +27,7 @@ pub fn solution_for(day: u8) -> Option<&'static dyn Solution> {
         3 => Some(&DAY03),
         4 => Some(&DAY04),
         5 => Some(&DAY05),
+        6 => Some(&DAY06),
         _ => None,
     }
 }
